@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Appendix · Concepts considered — the map behind the proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e12; --bg2:#0d1419; --panel:#121b22; --panel2:#16212a;
+    --line:#22303a; --line2:#2c3e4a;
+    --ink:#e8eff2; --mut:#9fb4bf; --dim:#647a85;
+    --green:#46d39a; --greenDim:#1f6b50; --amber:#ffb454; --red:#ff6b6b;
+    --ax:#2dd4bf; --axGlow:rgba(45,212,191,.10);
+    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif; --disp:'Fraunces',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(34,48,58,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(34,48,58,.18) 1px,transparent 1px); background-size:34px 34px;}
+  .wrap{display:grid; grid-template-columns:268px 1fr; max-width:1280px; margin:0 auto; min-height:100vh}
+  aside{position:sticky; top:0; height:100vh; overflow-y:auto; border-right:1px solid var(--line); padding:26px 20px 40px; background:rgba(10,14,18,.6)}
+  .brand{font-family:var(--disp); font-weight:900; font-size:21px; line-height:1.05; letter-spacing:-.01em; margin-bottom:4px}
+  .brand .ax{color:var(--ax)}
+  .brandsub{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:22px}
+  nav a{display:block; font-size:13.5px; color:var(--mut); text-decoration:none; padding:6px 10px; border-radius:6px; border-left:2px solid transparent; transition:.18s}
+  nav a:hover{color:var(--ink); background:var(--panel)}
+  nav a.on{color:var(--ax); border-left-color:var(--ax); background:var(--axGlow)}
+  nav .grp{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:18px 0 6px 10px}
+  nav a .st{font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; float:right; opacity:.85}
+  .st.ships{color:var(--green)} .st.work{color:var(--amber)} .st.gap{color:var(--ax)} .st.decision{color:var(--dim)} .st.fold{color:var(--dim)}
+  main{padding:clamp(28px,4vw,64px) clamp(22px,4vw,72px); max-width:940px}
+  section{padding-top:30px; margin-bottom:30px; border-bottom:1px solid var(--line); padding-bottom:34px; scroll-margin-top:18px}
+  section:last-child{border-bottom:0}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ax); display:flex; align-items:center; gap:9px; margin-bottom:12px}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--ax)}
+  h1{font-family:var(--disp); font-weight:900; font-size:clamp(34px,5.4vw,58px); line-height:1.02; letter-spacing:-.02em}
+  h2{font-family:var(--disp); font-weight:600; font-size:clamp(25px,3.4vw,38px); line-height:1.06; letter-spacing:-.015em; margin-bottom:6px}
+  h3{font-family:var(--sans); font-weight:700; font-size:19px; margin:24px 0 8px; color:var(--ink)}
+  h4{font-family:var(--mono); font-weight:600; font-size:13px; letter-spacing:.04em; color:var(--ax); margin:18px 0 6px}
+  p{color:var(--mut); margin:10px 0; max-width:74ch}
+  p b,li b{color:var(--ink); font-weight:600}
+  a{color:var(--ax); text-decoration:none; border-bottom:1px solid rgba(45,212,191,.3)}
+  a:hover{border-bottom-color:var(--ax)}
+  ul,ol{color:var(--mut); margin:10px 0 10px 22px; max-width:74ch}
+  li{margin:6px 0}
+  code{font-family:var(--mono); font-size:.88em; background:#0c1318; border:1px solid var(--line); border-radius:5px; padding:1px 6px; color:#bfe9e0}
+  .lead{font-size:19px; color:var(--ink); max-width:72ch}
+  .box{border:1px solid var(--line2); border-radius:10px; padding:15px 18px; margin:16px 0; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .box .bt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px; display:flex; gap:8px; align-items:center}
+  .box p{margin:4px 0}
+  .box.tip{border-color:rgba(45,212,191,.4); background:linear-gradient(180deg,var(--axGlow),transparent)} .box.tip .bt{color:var(--ax)}
+  .box.why{border-color:var(--line2)} .box.why .bt{color:var(--mut)}
+  .box.scan{border-color:rgba(45,212,191,.4); background:linear-gradient(180deg,rgba(45,212,191,.05),transparent)} .box.scan .bt{color:var(--ax)}
+  /* funnel */
+  .funnel{display:flex; flex-wrap:wrap; align-items:stretch; gap:8px; margin:18px 0}
+  .fstep{flex:1; min-width:104px; border:1px solid var(--line2); border-radius:9px; padding:11px 12px; background:linear-gradient(180deg,var(--panel2),var(--bg2))}
+  .fstep .fn{font-family:var(--mono); font-size:22px; font-weight:600; color:var(--ax); line-height:1}
+  .fstep .fl{font-size:12px; color:var(--mut); margin-top:5px; line-height:1.35}
+  .fstep.out .fn{color:var(--ink)}
+  /* table */
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:13.5px}
+  th,td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:middle}
+  th{font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--dim); white-space:nowrap}
+  td{color:var(--mut)} td b{color:var(--ink)}
+  tr.gaprow td{background:linear-gradient(90deg,rgba(45,212,191,.07),transparent)}
+  .cn{color:var(--ink); font-weight:600}
+  /* badges + chips */
+  .stat{font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:5px; border:1px solid var(--line2); white-space:nowrap}
+  .stat.ships{color:var(--green); border-color:var(--greenDim); background:rgba(70,211,154,.06)}
+  .stat.work{color:var(--amber); border-color:rgba(255,180,84,.4); background:rgba(255,180,84,.06)}
+  .stat.gap{color:var(--ax); border-color:rgba(45,212,191,.5); background:var(--axGlow)}
+  .stat.decision{color:var(--mut); border-color:var(--line2); background:rgba(159,180,191,.05)}
+  .stat.fold{color:var(--dim); border-color:var(--line2)}
+  .chip{font-family:var(--mono); font-size:11px; font-weight:600; padding:1px 8px; border-radius:999px; border:1px solid var(--line2); white-space:nowrap}
+  .chip.hi{color:var(--green); border-color:var(--greenDim)}
+  .chip.mid{color:var(--amber); border-color:rgba(255,180,84,.4)}
+  .chip.lo{color:var(--red); border-color:rgba(255,107,107,.4)}
+  .chip.na{color:var(--dim)}
+  .badges{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0 4px}
+  /* concept card */
+  .card{border:1px solid var(--line); border-radius:12px; padding:18px 20px 14px; margin:16px 0; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .card h3{margin-top:0}
+  .card .pain{color:var(--mut); margin:6px 0}
+  .card .verdict{color:var(--ink); margin:10px 0 4px; padding-left:12px; border-left:2px solid var(--ax)}
+  .spot{border:1px solid rgba(45,212,191,.5); box-shadow:0 0 0 1px rgba(45,212,191,.06), 0 18px 50px -30px rgba(45,212,191,.5); background:linear-gradient(180deg,rgba(45,212,191,.07),transparent)}
+  .crown{font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--ax); display:flex; gap:8px; align-items:center; margin-bottom:4px}
+  .twocol{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media(max-width:680px){ .twocol{grid-template-columns:1fr} }
+  .tagrow{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0}
+  .tag{font-family:var(--mono); font-size:11px; padding:3px 10px; border-radius:999px; border:1px solid var(--line2); color:var(--mut)}
+  .foot{margin-top:30px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+  /* details */
+  details{border:1px solid var(--line); border-radius:9px; margin:9px 0; background:var(--panel); overflow:hidden}
+  summary{cursor:pointer; padding:11px 15px; font-weight:600; color:var(--ink); font-size:13.5px; list-style:none; display:flex; gap:9px; align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"›"; color:var(--ax); font-family:var(--mono); transition:.2s; font-size:17px; line-height:1}
+  details[open] summary::before{transform:rotate(90deg)}
+  summary .sx{margin-left:auto; font-family:var(--mono); font-size:10.5px; color:var(--dim)}
+  details .ans{padding:2px 16px 14px 36px}
+  details .ans p{font-size:14px; margin:8px 0}
+  .rat{margin:11px 0; padding-left:12px; border-left:2px solid var(--line2)}
+  .rat .rl{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); display:flex; gap:10px; align-items:center; margin-bottom:2px}
+  .rat .rl .rs{font-weight:600}
+  .rat p{margin:1px 0; font-size:13.5px}
+  .s-hi{color:var(--green)} .s-mid{color:var(--amber)} .s-lo{color:var(--red)}
+  @media(max-width:860px){ .wrap{grid-template-columns:1fr} aside{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)} table{font-size:12px} th,td{padding:8px 7px} .hide-sm{display:none} }
+  .homelink{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); text-decoration:none; border:0; margin-bottom:18px}
+  .homelink:hover{color:var(--ax)}
+  .related{margin-top:18px; border-top:1px solid var(--line); padding-top:12px}
+  .related .rgrp{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin-bottom:8px}
+  .related a{display:block; font-family:var(--mono); font-size:11.5px; color:var(--mut); text-decoration:none; border:0; padding:4px 0}
+  .related a:hover{color:var(--ax)}
+  .related a.cur{color:var(--ax)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <a class="homelink" href="../index.html">← Back to Index</a>
+  <div class="brand">Appendix · Concepts <span class="ax">considered</span></div>
+  <div class="brandsub">the alternatives · and why the proposal won</div>
+  <nav id="nav">
+    <div class="grp">Frame</div>
+    <a href="#top">The triage</a>
+    <a href="#read">How to read</a>
+    <a href="#ladder">The eval ladder</a>
+    <a href="#verdict">The verdict table</a>
+    <div class="grp">🚀 Real gaps — build these</div>
+    <a href="#trust">Trust the evals <span class="st gap">gap</span></a>
+    <a href="#decide">The decision surface <span class="st gap">gap</span></a>
+    <a href="#completeness">Drift · reviewer agreement <span class="st gap">gap</span></a>
+    <a href="#optimize">Portable prompt optim. <span class="st gap">gap</span></a>
+    <div class="grp">✅ In Arize — but buried</div>
+    <a href="#copilot">Eval Copilot <span class="st ships">find/fix</span></a>
+    <a href="#variant">Variant segmentation <span class="st ships">find/fix</span></a>
+    <div class="grp">🔧 We worked around it</div>
+    <a href="#cost">Silent $0 cost <span class="st work">DX fix</span></a>
+    <div class="grp">Handoff</div>
+    <a href="#handoff">Where it goes in the proposal</a>
+    <a href="#sources">Sources</a>
+  </nav>
+  <div class="related">
+    <div class="rgrp">Related pages</div>
+    <a href="proposal-v3.html">Proposal</a>
+    <a href="mocks-v3.html">UI mocks</a>
+    <a class="cur">Concepts considered</a>
+    <a href="quick-fixes.html">Quick fixes</a>
+  </div>
+</aside>
+
+<main>
+
+<!-- ===================== TOP ===================== -->
+<section id="top">
+  <div class="eyebrow">appendix · concepts considered for the proposal</div>
+  <h1>The alternatives,<br/>and why the proposal <span style="font-style:italic">won</span>.</h1>
+  <p class="lead">Before landing on <i>From Signal to Decisions</i>, I worked through eight candidate concepts for "what should Arize build to grow AX adoption among developers building agents." This page is that map: each concept, and the one honest answer to <b>"why isn't this the proposal?"</b></p>
+
+  <div class="box tip"><div class="bt">◆ how each concept was tested</div>
+    <p style="margin-top:6px">One line per concept: <code>pain observed → what Arize / the market already does → what's actually still missing → verdict</code>. Two rules keep it honest:</p>
+    <p><b>1 · Name what already exists first.</b> Credibility comes from being specific about what Arize and competitors ship today — not from pretending the field is empty.</p>
+    <p><b>2 · "A competitor shipped it" is market evidence, not a verdict.</b> If Langfuse or an open standard solves a piece but Arize doesn't, and the developer has to leave Arize to get it, that fragmentation is a reason to <i>build</i> — not a reason to drop. We don't get a capability "for free" because someone else has it.</p>
+  </div>
+
+  <p style="color:var(--dim)">The two highest-value gaps below — trusting the evals, and turning high-stakes failures into recorded decisions — are what the proposal is built on. This appendix is the reasoning behind that choice; the <a href="#handoff">handoff</a> says where each thread lands in the proposal itself.</p>
+</section>
+
+<!-- ===================== HOW TO READ ===================== -->
+<section id="read">
+  <div class="eyebrow">how to read</div>
+  <h2>Every concept lands in one of three places.</h2>
+  <div class="box tip"><div class="bt">◆ the three verdicts</div>
+    <p style="margin-top:6px"><b><span class="stat gap">🚀 real gap</span></b> — Arize doesn't do this, and a developer building agents would be better off if it did. <i>Build it.</i> Either the headline, or a piece that makes the headline complete.</p>
+    <p><b><span class="stat ships">✅ in Arize — but buried</span></b> — the capability exists, but it's hard to find or only half-works. The fix is <i>discoverability or reliability</i>, not a new build.</p>
+    <p><b><span class="stat work">🔧 worked around</span></b> — I hit it during the build and solved it outside the platform. A small DX papercut, and a candidate to make first-party.</p>
+  </div>
+</section>
+
+<!-- ===================== THE EVAL LADDER ===================== -->
+<section id="ladder">
+  <div class="eyebrow">the backbone · what evals are actually for</div>
+  <h2>Not every eval failure is a bug to fix.</h2>
+  <p class="lead">The concepts below only sort cleanly once you see that evals do different jobs depending on <i>where</i> the failure sits. This is the spine the whole proposal hangs from.</p>
+
+  <p>Failures stack on a ladder, and the rung decides what you <b>do</b> about them — patch it, or <i>decide</i> about it:</p>
+
+  <table>
+    <thead>
+    <tr><th>Rung</th><th>The question</th><th>Example failure</th><th class="hide-sm">What you do with it</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b class="cn">1 · Reliable</b></td><td>Does it even run?</td><td>tool errors, malformed output, timeouts</td><td class="hide-sm"><b>Triage &amp; fix.</b> Not a decision — just broken.</td></tr>
+      <tr class="gaprow"><td><b class="cn">2 · Capable &amp; accurate</b></td><td>Does it do the <i>right</i> thing?</td><td>missing tool, missing permission, a policy that blocks correct reasoning, hallucination</td><td class="hide-sm"><b>Frame a decision.</b> A tradeoff, often intentional — needs an owner and a record.</td></tr>
+      <tr><td><b class="cn">3 · Good experience</b></td><td>Is it a <i>good</i> experience?</td><td>too verbose, off-tone, misses user frustration</td><td class="hide-sm">Tune — usually a product/design call.</td></tr>
+      <tr><td><b class="cn">4 · Exploratory</b></td><td>What don't we know yet?</td><td>new intents, drift, unexplained spikes</td><td class="hide-sm">Investigate.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box tip"><div class="bt">◆ the move that matters</div>
+    <p style="margin-top:6px"><b>Low rungs are fixes. High rungs are decisions.</b> Rung-1 failures get triaged and patched — nobody needs to weigh in. Rung-2 is different: the agent hit a boundary (it lacked a tool, a permission, the knowledge, or a policy blocked it), and resolving it is a <i>tradeoff</i> someone has to own and record — not a line an engineer quietly ships.</p>
+    <p><b>And the ladder is climbed for a business objective, not an eval score.</b> Which Rung-2 tradeoffs are worth making is set by the agent's North Star — its actual purpose — not by whichever eval happens to be red. The two lead gaps below (<a href="#trust">trusting the evals</a>, <a href="#decide">the decision surface</a>) are exactly the pieces missing to make that real — which is why they're what the proposal builds.</p>
+  </div>
+</section>
+
+<!-- ===================== VERDICT TABLE ===================== -->
+<section id="verdict">
+  <div class="eyebrow">at a glance · the whole story</div>
+  <h2>The verdict table.</h2>
+  <p>The eight concepts and where each one landed. A reader who stops here has the whole story; the sections below are the reasoning.</p>
+  <table>
+    <thead>
+    <tr><th>Concept</th><th>One-line pain</th><th>Verdict</th><th class="hide-sm">Where it goes</th></tr>
+    </thead>
+    <tbody>
+    <tr class="gaprow">
+      <td><a href="#trust"><b class="cn">Trust the evals</b></a></td>
+      <td>You generated an eval — but can you <i>trust</i> it?</td>
+      <td><span class="stat gap">🚀 real gap</span></td>
+      <td class="hide-sm">→ the proposal's headline</td>
+    </tr>
+    <tr class="gaprow">
+      <td><a href="#decide"><b class="cn">The decision surface</b></a></td>
+      <td>A high-stakes failure needs a recorded decision, not a quiet code fix.</td>
+      <td><span class="stat gap">🚀 real gap</span></td>
+      <td class="hide-sm">→ the proposal's decision engine</td>
+    </tr>
+    <tr class="gaprow">
+      <td><a href="#completeness"><b class="cn">Live judge-drift</b></a></td>
+      <td>Does the grader still agree with humans on live traffic?</td>
+      <td><span class="stat gap">🚀 real gap</span></td>
+      <td class="hide-sm">→ completes trust-the-evals</td>
+    </tr>
+    <tr class="gaprow">
+      <td><a href="#completeness"><b class="cn">Reviewer agreement</b></a></td>
+      <td>Do your human reviewers even agree with each other?</td>
+      <td><span class="stat gap">🚀 real gap</span></td>
+      <td class="hide-sm">→ completes trust-the-evals</td>
+    </tr>
+    <tr class="gaprow">
+      <td><a href="#optimize"><b class="cn">Portable prompt optimization</b></a></td>
+      <td>Optimizing your prompt shouldn't force it into Prompt Hub.</td>
+      <td><span class="stat gap">🚀 real gap</span></td>
+      <td class="hide-sm">→ supporting · pairs with trust-the-evals</td>
+    </tr>
+    <tr>
+      <td><a href="#copilot"><b class="cn">Eval Copilot</b></a></td>
+      <td>Generate an eval from a bad trace — exists, but flaky and buried.</td>
+      <td><span class="stat ships">✅ in Arize</span></td>
+      <td class="hide-sm">→ discoverability + reliability fix</td>
+    </tr>
+    <tr>
+      <td><a href="#variant"><b class="cn">Variant segmentation</b></a></td>
+      <td>Compare prompt/tool/agent variants in one view.</td>
+      <td><span class="stat ships">✅ in Arize</span></td>
+      <td class="hide-sm">→ discoverability fix</td>
+    </tr>
+    <tr>
+      <td><a href="#cost"><b class="cn">Silent $0 cost</b></a></td>
+      <td>Cost reads $0 silently when a model slug doesn't match.</td>
+      <td><span class="stat work">🔧 worked around</span></td>
+      <td class="hide-sm">→ quick-fix list</td>
+    </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== TRUST THE EVALS — SPOTLIGHT ===================== -->
+<section id="trust">
+  <div class="card spot">
+  <div class="crown">★ the gap the proposal headline grew from</div>
+  <div class="eyebrow" style="margin-top:4px">real gap · the lead</div>
+  <h3 style="font-size:23px">Trust the evals — is the grader <span style="font-style:italic">accurate</span>, and is it measuring the <span style="font-style:italic">right thing</span>?</h3>
+  <div class="badges"><span class="stat gap">🚀 real gap</span><span class="chip">the proposal's headline</span></div>
+  <p class="pain"><b>Pain:</b> every tool can now <b>generate</b> an eval (an automated grader) from a bad output — none check whether that grader is any good. Two separate questions go unanswered: is it <b>accurate</b> (does it agree with a human, or does it false-alarm), and is it <b>measuring the right thing</b> (is it graded against what the agent is actually <i>for</i>). You're asked to trust a grader you never tested, scoring something you never confirmed matters.</p>
+  <p class="pain"><b>What to build:</b> before a generated eval ships, test it on held-back examples and report whether it still agrees with human reviewers and how often it false-alarms. Activation metric: <i>% of new agent projects with ≥1 persisted, trust-checked AX eval within 7 days.</i></p>
+  <p class="verdict"><b>Why it's the headline:</b> observability tells you <i>what</i> failed; nothing tells you whether the thing measuring failure can be trusted. Every downstream decision in the proposal rests on a number from an eval — so the eval has to be trustworthy first. It also has a natural <b>lifecycle — certify → monitor → decompose</b>, which is where the next two gaps (<a href="#completeness">judge-drift + reviewer agreement</a>) live: certify the grader pre-ship on held-out examples, keep the agreement check running post-ship and alert on decay, and break the score down per rubric criterion to localize the cause.</p>
+
+  <details>
+    <summary>market scan &amp; evidence <span class="sx">verdict: open sliver, closing fast · 2026-06-11</span></summary>
+    <div class="ans">
+      <p><b>Tighten the claim.</b> "Calibrate a judge against human labels" is now table stakes (LangSmith, Galileo, Patronus, Braintrust all ship it). The unoccupied sliver is specifically <b>held-out replay + overfit / false-positive-rate guard as a productized step</b> — not judge calibration in general.</p>
+      <p><b>① At Arize — open.</b> Arize has the <i>narrative</i> but not the <i>surface</i>: its flagship blog literally prescribes the loop ("re-run on the same set <b>and a holdout set</b>," names Cohen's kappa + confusion matrices), and it publicly engaged the exact thesis in its <a href="https://arize.com/blog/breaking-down-evalgen-who-validates-the-validators/">EvalGen "Who Validates the Validators" breakdown</a> — but ships only the primitives (annotations, Phoenix Evals), <b>no first-class eval-of-eval / held-out-replay product</b>. (<a href="https://arize.com/blog/how-to-build-llm-as-a-judge-evaluators-that-hold-up-in-production/">judge blog</a>)</p>
+      <p><b>② Best practice to cite.</b> Shankar et al., <a href="https://arxiv.org/abs/2404.12272">"Who Validates the Validators?" (EvalGen, UIST 2024)</a> — names <b>"criteria drift"</b> (criteria overfit to outputs seen), the precise risk held-out replay catches. Methodology: human-labeled validation set → judge↔human agreement via Cohen's / weighted kappa (human ceiling κ≈0.80) → confusion matrix → bias correction → <b>retest on holdout</b>. The false-positive-rate guard is the second half.</p>
+      <p><b>③ Closest competitor — LangSmith "Align Evals" (Jul 29 2025).</b> Owns "score your evaluator" (live alignment score, baseline compare, sorted unaligned cases) — <b>but optimizes on the labeled set with no held-out split or overfit warning.</b> That sliver is genuinely unoccupied; the surrounding space is not. (<a href="https://changelog.langchain.com/announcements/introducing-align-evals-streamlining-llm-application-evaluation">changelog</a>)</p>
+    </div>
+  </details>
+  </div>
+</section>
+
+<!-- ===================== THE DECISION SURFACE ===================== -->
+<section id="decide">
+  <div class="card">
+  <div class="eyebrow">real gap · what high-rung failures actually need</div>
+  <h3 style="font-size:21px">The decision surface — a Rung-2 failure is a decision to record, not a code fix.</h3>
+  <div class="badges"><span class="stat gap">🚀 real gap</span><span class="chip">the proposal's decision engine</span></div>
+  <p class="pain"><b>Pain:</b> when an agent hits a Rung-2 boundary — a policy blocks correct reasoning, a missing permission forces a handoff, a capability gap — the resolution is a <b>tradeoff someone has to own and record</b>, and that someone is often <i>not</i> the engineer (a policy owner, a platform team, legal). There's no surface where that decision gets framed, routed, signed off, and kept. Today it's a screenshot in Slack: the recommendation exists; the decision never gets recorded, and nothing tracks why. <b>Lived evidence:</b> DoorDash built internal tooling that "skinned" Arize so operators could manage prompt versions and configure evals on their side, passing through to Arize where the evals ran. It "felt sloppy" — because the surface they needed didn't exist, so they hand-built it.</p>
+  <p class="pain"><b>What to build:</b> a decision record for high-rung failures — the issue, the evidence, the tradeoff (the upside <i>and</i> what it costs), the owner it routes to, and a status trail (proposed → routed → decided → verified). Viewable by the non-engineer owner without an Arize login, because they don't have one yet.</p>
+  <p class="verdict"><b>Why it's a gap, not plumbing:</b> the eval-config <i>data round-trip</i> already ships (the Online Tasks GraphQL API), so this isn't about wiring. What's missing is the surface where a tradeoff becomes an owned, recorded decision — the thing the ladder says Rung-2 failures need and nothing provides. In the proposal this is the <b>Decision Artifact</b>: the engine that turns a trusted eval signal into a decision that actually gets made.</p>
+
+  <details>
+    <summary>market scan &amp; evidence <span class="sx">verdict: gap real, but must differentiate · 2026-06-11</span></summary>
+    <div class="ans">
+      <p><b>Sharpen the wedge.</b> "Non-technical prompt approvals" is <i>already owned</i> by competitors — so this can't be approvals-in-the-abstract. The defensible wedge is the <b>operator console that round-trips to Arize's eval <i>runtime</i></b> (configure on your side → execute inside Arize), not approvals per se.</p>
+      <p><b>The data round-trip IS first-class.</b> The Online Tasks GraphQL API exposes <code>createEvalTask</code> / <code>patchEvalTask</code> / <code>runOnlineTask</code> (config: <code>modelId</code>, <code>samplingRate</code>, <code>queryFilter</code>, <code>templateEvaluators</code>, <code>llmConfig</code>, <code>runContinuously</code>) — but mutations are <b>enterprise-gated</b>. The policy-owner view / approval UX is <b>NOT</b> first-class — teams hand-roll it (the DoorDash skin). <b>Gap remaining:</b> the engineer-facing config plumbing exists, but there's no first-party surface where a non-engineer policy owner reviews, approves, and signs off on eval/prompt changes with an audit trail.</p>
+      <p><b>① At Arize — open (no native approvals).</b> AX ships granular <a href="https://arize.com/docs/ax/security-and-settings/sso-and-rbac">RBAC + SSO</a> and immutable Prompt Hub versions/tags, but <b>RBAC ≠ approvals and tags ≠ sign-off</b> — no maker-checker state machine. The <a href="https://arize.com/blog/building-ai-factory-self-improving-agents-arize-ax/">"AI Factory" blog</a> adds an <i>engineer-only</i> propose→review→approve loop on agent-proposed PRs — not a non-technical governance console. The banking blog cites "workflows for non-technical stakeholders" but means <i>visibility</i>, not change-management. <b>Not on any public roadmap found.</b></p>
+      <p><b>② Best practice to cite.</b> <b>Maker-checker / segregation of duties</b> (SR 11-7 model-risk lineage — note SR 11-7 was replaced by a principles-based framework on 2026-04-17; the SoD pattern persists). The proven config-approval <b>UX to copy is LaunchDarkly</b>: per-environment required approvals, PR-style review, tag-scoped enforcement. GitOps protected-branch review is the engineer-native equivalent.</p>
+      <p><b>③ Closest competitors.</b> <b>Humanloop</b> = closest analog (non-technical prompt editing + deployment-approval workflows) — but it <a href="https://humanloop.com/platform/prompt-management">shut down Sept 2025, acquired by Anthropic</a>, leaving a hole. <b>Braintrust</b> = strongest eval-config governance (RBAC over who can approve scorers/datasets + CI release gates). <b>PromptLayer</b> = RBAC + approval + audit for regulated teams. <b>Credo AI</b> = governs systems/risk, not prompt/eval configs (adjacent). <i>None round-trip to an external eval runtime — that's the daylight.</i></p>
+    </div>
+  </details>
+  </div>
+</section>
+
+<!-- ===================== COMPLETENESS GAPS ===================== -->
+<section id="completeness">
+  <div class="eyebrow">real gaps · what makes trust-the-evals complete</div>
+  <h2>Two more gaps — and why "a competitor has it" is a reason to build, not skip.</h2>
+  <p>These two live inside the trust-the-evals lifecycle: certify the grader pre-ship, then <b>monitor</b> it on live traffic, and <b>decompose</b> a stuck score to find the cause. Pieces of each exist at other vendors — Langfuse, Label Studio. That's the problem, not the answer: a developer who has to leave Arize to check whether their own grader still works has a broken loop. Owning these is what makes the eval trustworthy end-to-end, on one surface.</p>
+  <div class="twocol">
+    <div class="card">
+      <h3 style="margin-top:6px">Live judge-drift — does the grader still agree with humans?</h3>
+      <div class="badges"><span class="stat gap">🚀 real gap · the monitor beat</span></div>
+      <p class="pain"><b>Pain:</b> a grader certified today drifts. On live traffic the grader's label and a human's land on the same span, but nothing tracks <i>where they diverge</i> over time or alerts when agreement decays below the bar it was certified at.</p>
+      <p class="verdict"><b>Why build it anyway:</b> Langfuse shipped the comparison view (kappa, agreement-over-time) in Nov 2025 — but it's <i>in Langfuse</i>. Arize has no live agreement monitor, so a team tracing in Arize must wire up a second tool to know its grader still works. That surface-switch <i>is</i> the gap. In the proposal this is the <b>monitor</b> beat: keep the certified agreement check running post-ship and alert on decay.</p>
+      <details>
+        <summary>market scan <span class="sx">2026-06-12</span></summary>
+        <div class="ans">
+          <p><b>① At Arize.</b> Annotations are a <i>manual</i> way to find judge↔human disagreement; <a href="https://arize.com/docs/ax/evaluate/online-evals">online evals</a> emit only a label per span; <a href="https://arize.com/docs/ax/evaluate/align-evals-to-human-feedback">Align Evals</a> does the comparison <b>offline, pre-ship, on a calibration set</b>. No live agreement time-series, no drift alert.</p>
+          <p><b>② Best practice.</b> Use <b>Cohen's kappa, not correlation</b> — correlation hides systematic bias (<a href="https://arxiv.org/html/2510.09738v1">"Judge's Verdict," Oct 2025</a>). Judges drift on a ~60–90 day horizon, so agreement has to be re-measured continuously.</p>
+          <p><b>③ The market.</b> <a href="https://langfuse.com/changelog/2025-11-07-score-analytics-multi-score-comparison">Langfuse Score Analytics (2025-11-07)</a> ships live human-vs-judge comparison with kappa + over-time tracking. <a href="https://www.langchain.com/blog/introducing-align-evals">LangSmith Align Evals</a> is one-time static calibration and names drift as <i>roadmap</i>. Threshold <b>alerting</b> on decay is unoccupied — and belongs inside Arize's trust-the-evals loop, not bolted on from a second vendor.</p>
+          <p style="color:var(--dim); font-size:13px"><b>Honest caveat:</b> live agreement needs a steady stream of fresh human labels, which many teams don't generate at volume — so in practice this leans on the same held-out set, sampled over time.</p>
+        </div>
+      </details>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:6px">Reviewer agreement — do the humans even agree?</h3>
+      <div class="badges"><span class="stat gap">🚀 real gap · the decompose beat</span></div>
+      <p class="pain"><b>Pain:</b> when an eval won't settle, you can't tell <i>noisy human labels</i> from a <i>weak grader prompt</i>. AX labeling queues send each item to one reviewer and never show whether reviewers agree or where they split — so "the grader is wrong" and "the humans disagree" look identical.</p>
+      <p class="verdict"><b>Why build it anyway:</b> inter-annotator agreement is well-trodden — Label Studio, Argilla, Prodigy all ship it, Langfuse computes it between score sources. But none of that is <i>in Arize</i>, where the grader lives. The piece genuinely missing everywhere: breaking a low agreement score down <b>per rubric criterion</b> to localize which sub-criterion is dragging the grader — the <b>decompose</b> beat.</p>
+      <details>
+        <summary>market scan <span class="sx">2026-06-12</span></summary>
+        <div class="ans">
+          <p><b>① At Arize.</b> <a href="https://arize.com/docs/ax/evaluate/human-annotations">Human annotations</a> have no multi-annotator-per-item or agreement metric; <a href="https://arize.com/docs/ax/evaluate/annotation-queues">labeling queues</a> actively <b>dedupe</b> — built to send each item to one reviewer, the opposite of overlap-for-agreement. No decomposition feature, though the <a href="https://arize.com/blog/how-to-build-llm-as-a-judge-evaluators-that-hold-up-in-production/">judge blog</a> already advises "correctness, grounding, safety… should be separate evals."</p>
+          <p><b>② Best practice.</b> IAA: Artstein &amp; Poesio, <a href="https://aclanthology.org/J08-4004/">"Inter-Coder Agreement" (2008)</a>; pair with Dawid–Skene / MACE for per-annotator reliability. Decomposition: Shankar et al., <a href="https://arxiv.org/abs/2404.12272">EvalGen (UIST 2024)</a> names "criteria drift"; analytic rubrics beat holistic single-score judges.</p>
+          <p><b>③ The market.</b> <a href="https://labelstud.io/blog/how-to-use-krippendorff-s-alpha-to-measure-annotation-agreement/">Label Studio</a>, <a href="https://docs.v1.argilla.io/en/latest/reference/python/python_annotation_metrics.html">Argilla</a>, Prodigy ship IAA; <a href="https://langfuse.com/docs/evaluation/evaluation-methods/score-analytics">Langfuse</a> computes it in-platform. Per-criterion decomposition tied to the grader is the unoccupied piece.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div class="box why"><div class="bt">▣ the lifecycle, for the record</div>
+    <p style="margin-top:6px">Together with held-out replay, these make trust-the-evals a <b>lifecycle</b>, not a one-shot check: <b>certify</b> the grader pre-ship on held-out examples → <b>monitor</b> agreement post-ship and alert on decay → <b>decompose</b> the score per criterion to localize the cause. "Agreement" = Cohen's / weighted kappa against a certified threshold.</p>
+  </div>
+</section>
+
+<section id="optimize">
+  <div class="card">
+  <div class="eyebrow">real gap · supporting · I hit this in the build</div>
+  <h3 style="margin-top:6px">Portable prompt optimization — optimize your prompt without surrendering it to Prompt Hub.</h3>
+  <div class="badges"><span class="stat gap">🚀 real gap · supporting</span><span class="chip">pairs with trust-the-evals</span></div>
+  <p class="pain"><b>Pain:</b> AX's polished prompt-optimization path wants the prompt to live in <b>Prompt Hub</b> — coupling that sits in tension with Arize's OTel/OpenInference neutrality &amp; portability brand. Getting the prompt into AX is the realest switching cost the platform has. I hit this directly: I kept my prompt in-repo as source of truth and synced a <b>view-only mirror</b> into AX, verifying it doesn't break experiments, Playground, or online-evals. The only forfeit is Hub-native versioning, which the build didn't need.</p>
+  <p class="pain"><b>What to build:</b> run the optimizer on your in-repo prompt against eval feedback and write the improved prompt back as a reviewable <b>diff / PR</b> — hosting optional. No competitor ships that exact motion as one integrated step.</p>
+  <p class="verdict"><b>Why it earns a spot — and why it's supporting, not the headline:</b> it's the strongest defensibility play in the set, but by <i>gravity</i>, not lock-in. The pull to manage prompts inside Arize shouldn't come from coupling — it should come from the fact that the evals are <b>meaningful and tied to the business outcome</b>, which is the headline gap. Make the eval loop the best place to know whether a prompt change actually helped, and the prompt (and its variants and experiments) follows the loop home on its own. That's why it pairs natively with <a href="#trust">Trust the evals</a>: "is the optimized prompt actually better when tested on examples it wasn't built from?"</p>
+  <details>
+    <summary>market scan &amp; evidence <span class="sx">verdict: reframe to the write-back · 2026-06-11</span></summary>
+    <div class="ans">
+      <p><b>The claim moves.</b> "Optimize a raw-string prompt" is <i>already shipped</i> — so the wedge isn't raw strings. It's: <b>an eval-driven optimizer that writes the improved prompt back to your repo as a reviewable diff/PR, no Hub hosting.</b> That exact motion is genuinely unoccupied.</p>
+      <p><b>① At Arize — claims verified, with nuance.</b> Raw-string SDK input = <b>CONFIRMED</b> (<a href="https://arize.com/docs/ax/develop/prompt-learning-sdk">Prompt-Learning SDK</a> takes a string / message list / PromptVersion). "OpenAI-only" = <b>partially true</b> — default <code>model_choice="gpt-4"</code> and docs list only OpenAI, but the <a href="https://github.com/Arize-ai/prompt-learning">open-source repo</a> has an undocumented <code>provider</code> hook that bypasses the OpenAI default. <b>Git/diff/PR write-back: does NOT exist anywhere in Arize</b> — the beta UI path runs off Hub and saves back as immutable Hub versions. No portable-optimization roadmap found.</p>
+      <p><b>② State of the art = code-native.</b> <b>DSPy</b> (MIPROv2, BootstrapFewShot) compiles + <code>save()</code>s the optimized program <b>into your codebase, no hosted registry</b>; OPRO / APE / TextGrad all operate on prompts as in-code parameters. Hosting in a vendor registry is a <i>product choice, not a technical requirement</i> — exactly the tension this names.</p>
+      <p><b>③ Closest competitor — Braintrust.</b> <code>braintrust pull/push</code> = bidirectional prompt↔git sync + PR evals that gate merges; <b>Loop</b> auto-optimizes. But even Braintrust treats its registry as home and <i>syncs</i> to git — <b>no tool found runs an optimizer and emits an automatic PR diff against your in-repo prompt.</b> That specific motion is open, and lands squarely on Arize's neutrality/portability brand. (<a href="https://www.braintrust.dev/articles/what-is-prompt-management">git sync</a>)</p>
+    </div>
+  </details>
+  </div>
+</section>
+
+<!-- ===================== IN ARIZE BUT BURIED ===================== -->
+<section id="copilot">
+  <div class="eyebrow">in Arize — but buried or half-working · a find/fix, not a build</div>
+  <h2>Already in Arize — the discoverability &amp; reliability fixes.</h2>
+  <p>Two concepts I considered turned out to already exist in Arize — so the honest move isn't to pitch them, it's to name what's actually wrong: you can't find it, or it doesn't reliably work. That's a cheaper fix than a new build, and being straight about it is part of what makes the real gaps above credible.</p>
+  <div class="twocol">
+    <div class="card">
+      <h3 style="margin-top:6px">Eval Copilot — generate an eval from a bad trace</h3>
+      <div class="badges"><span class="stat ships">✅ in Arize · via Alyx</span></div>
+      <p class="pain"><b>The originating gap:</b> a developer looking at a bad trace wants to turn it into a guarding eval without leaving their flow. Real need — it's why I considered it.</p>
+      <p class="pain"><b>What's actually there:</b> Alyx's Eval Builder does this today — but two things hold it back, and I hit both. It's <b>unreliable</b> (it failed twice when I asked it to create an eval during the build), and it's <b>undiscoverable</b> (you have to already know it's there to invoke it). The capability ships; the experience doesn't.</p>
+      <p class="verdict"><b>Verdict:</b> not a new build — a <b>reliability + discoverability</b> fix. Make the eval-from-trace path land reliably, and surface it where the developer is already staring at the failure. The deeper residue it can't answer — <i>is the generated eval any good?</i> — isn't this concept; that's <a href="#trust">Trust the evals</a>.</p>
+    </div>
+    <div class="card" id="variant" style="scroll-margin-top:80px">
+      <h3 style="margin-top:6px">Variant segmentation — compare prompt / tool / agent variants in one view</h3>
+      <div class="badges"><span class="stat ships">✅ in Arize · custom attribute</span></div>
+      <p class="pain"><b>The originating gap:</b> you change a prompt, a tool, or the agent graph, and you want every eval / cost / latency view to split by which variant produced each trace — without standing up a separate experiment each time.</p>
+      <p class="pain"><b>What's actually there:</b> stamp a custom attribute on the span (the docs call it an "A/B variant") and pivot on it — Feb-2026 Pivot Table widgets plus full-agent experimentation already cover this. (Arize also deliberately doesn't route production traffic, which is the right call.) So the capability is reachable; it's just buried in the docs.</p>
+      <p class="verdict"><b>Verdict:</b> a <b>discoverability</b> fix, not a build — make the "tag a variant, segment by it" pattern obvious in the UI. Worth noting it works even with prompts kept fully outside Arize, which quietly <i>weakens</i> Prompt-Hub lock-in as a moat — and supports the gravity argument under <a href="#optimize">portable optimization</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WORKED AROUND ===================== -->
+<section id="cost">
+  <div class="eyebrow">worked around · solved outside the platform during the build</div>
+  <h2>The one I just worked around.</h2>
+  <div class="card">
+  <h3 style="margin-top:6px">Silent $0 cost</h3>
+  <div class="badges"><span class="stat work">🔧 worked around · DX fix</span></div>
+  <p class="pain"><b>Pain:</b> cost columns show $0 — easy to mistake for "free." OpenRouter slugs (<code>anthropic/claude-sonnet-4</code>) don't match AX's ~63 built-in price configs, so the per-token match fails <b>silently</b>. The sneakiest friction of the build — the other papercuts announce themselves; this one doesn't.</p>
+  <p class="pain"><b>What I did:</b> added custom cost configs per OpenRouter model slug (Settings → Cost Tracking, cost-per-million-tokens) so spend renders.</p>
+  <p class="verdict"><b>Verdict:</b> a small DX fix to make first-party — a "$0 / unmatched slug" warning plus auto-mapping for known gateways (OpenRouter etc.). Not a strategic gap; just a papercut every team behind a gateway hits and hand-rolls the same way.</p>
+  <details>
+    <summary>existing solution &amp; gap remaining</summary>
+    <div class="ans"><p>Custom cost configurations are supported; they apply only to <i>future</i> traces. <b>Gap remaining:</b> the platform doesn't warn that a model slug failed to match a price config (silent $0), and doesn't auto-map common gateway slugs — so every team hits this and hand-rolls the same fix.</p></div>
+  </details>
+  </div>
+</section>
+
+<!-- ===================== HANDOFF ===================== -->
+<section id="handoff">
+  <div class="eyebrow">the handoff · where this lands in the proposal</div>
+  <h2>Where it goes in the proposal.</h2>
+  <p>This page is the reasoning; <a href="proposal-v3.html"><i>From Signal to Decisions</i></a> is the build. The two lead gaps each carry a thread straight into it.</p>
+  <div class="box why"><div class="bt">▣ where each gap lands</div>
+    <p style="margin-top:8px"><b>Trust the evals → the verified-lift close.</b> The proposal closes a decision only on <i>verified</i> movement of the business metric, and labels every projection a ceiling, not a point estimate — the same instinct (don't trust a number you haven't tested), moved up from the eval to the outcome.</p>
+    <p><b>The decision surface → decision routing.</b> The proposal's Decision Artifact routes capability / policy / permission tradeoffs to the non-engineer owner who actually decides them, viewable via a login-less link, with a status trail — the Rung-2 "decide and record" move, made real.</p>
+  </div>
+  <div class="tagrow">
+    <span class="tag">trust the grader, not just the agent</span><span class="tag">name what already exists first</span><span class="tag">competitor-shipped ≠ skip it</span><span class="tag">low rungs fix, high rungs decide</span><span class="tag">outcome &gt; eval score</span>
+  </div>
+</section>
+
+<!-- ===================== SOURCES ===================== -->
+<section id="sources">
+  <div class="eyebrow">provenance</div>
+  <h2>Where this comes from.</h2>
+  <ul>
+    <li><a href="proposal-v3.html">proposal-v3.html</a> — the "From Signal to Decisions" proposal this appendix supports.</li>
+    <li><a href="quick-fixes.html">quick-fixes.html</a> — the onboarding papercuts found hands-on during the build.</li>
+    <li><a href="https://arize.com/docs/ax/resources/graphql-api/online-tasks-api">Online Tasks GraphQL API</a> · <a href="https://arize.com/docs/ax/resources/graphql-api/getting-started-with-programmatic-access">Programmatic Access</a> — decision-surface data-plane verification.</li>
+  </ul>
+  <div class="foot">appendix · eight concepts considered · pain → what already exists → what's still missing → verdict · market scan 2026-06-11, red-team 2026-06-12 · supports the proposal "From Signal to Decisions"</div>
+</section>
+
+</main>
+</div>
+
+<script>
+  /* scrollspy */
+  const links = [...document.querySelectorAll('nav a')];
+  const map = Object.fromEntries(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { links.forEach(l => l.classList.remove('on')); map[e.target.id]?.classList.add('on'); } });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('section[id], #variant').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

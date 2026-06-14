@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nine quick fixes · Arize AX onboarding & DX papercuts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e12; --bg2:#0d1419; --panel:#121b22; --panel2:#16212a;
+    --line:#22303a; --line2:#2c3e4a;
+    --ink:#e8eff2; --mut:#9fb4bf; --dim:#647a85;
+    --green:#46d39a; --greenDim:#1f6b50; --amber:#ffb454; --red:#ff6b6b;
+    --ax:#2dd4bf; --axGlow:rgba(45,212,191,.10);
+    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif; --disp:'Fraunces',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(34,48,58,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(34,48,58,.18) 1px,transparent 1px); background-size:34px 34px;}
+
+  /* shell: sticky side nav + content column */
+  .shell{display:grid; grid-template-columns:226px minmax(0,880px); gap:clamp(18px,3vw,44px); justify-content:center; align-items:start}
+  .page{padding:clamp(28px,4vw,60px) clamp(20px,4vw,40px) clamp(28px,4vw,60px) 0; min-width:0}
+  section{padding-top:26px; margin-bottom:8px; scroll-margin-top:18px}
+
+  /* SIDE NAV */
+  .sidenav{position:sticky; top:0; align-self:start; max-height:100vh; overflow-y:auto;
+    padding:clamp(28px,4vw,60px) 4px clamp(28px,4vw,60px) clamp(12px,2vw,20px);
+    font-family:var(--mono)}
+  .sidenav .navtitle{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:12px}
+  .sidenav a{display:flex; gap:9px; align-items:baseline; padding:6px 9px; border-left:2px solid var(--line); color:var(--mut); font-size:11.5px; line-height:1.4; text-decoration:none; transition:.16s}
+  .sidenav a:hover{color:var(--ink); border-left-color:var(--line2); background:rgba(255,255,255,.015)}
+  .sidenav a.active{color:var(--ink); border-left-color:var(--ax); background:var(--axGlow)}
+  .sidenav a .nn{color:var(--dim); flex:none; width:13px; text-align:right}
+  .sidenav a.active .nn{color:var(--ax)}
+  .sidenav a .nt{flex:1; min-width:0}
+  .sidenav .navfoot{margin-top:14px; padding-top:12px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:7px}
+  .sidenav .navfoot a{border-left:0; padding:0 0 0 9px; color:var(--ax); font-size:11px}
+  @media(max-width:920px){
+    .shell{display:block; max-width:880px; margin:0 auto}
+    .page{padding:clamp(20px,4vw,40px)}
+    .sidenav{display:none}
+  }
+
+  /* LIGHTBOX */
+  .lb-overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+    background:rgba(4,7,9,.86); backdrop-filter:blur(3px); padding:32px; cursor:zoom-out}
+  .lb-overlay.open{display:flex}
+  .lb-overlay img{max-width:96vw; max-height:92vh; border:1px solid var(--line2); border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .lb-hint{position:fixed; top:18px; right:22px; font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--mut)}
+  .shot img{cursor:zoom-in}
+
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ax); display:flex; align-items:center; gap:9px; margin-bottom:12px}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--ax)}
+  h1{font-family:var(--disp); font-weight:900; font-size:clamp(34px,6vw,58px); line-height:1.0; letter-spacing:-.02em}
+  h2{font-family:var(--disp); font-weight:600; font-size:clamp(22px,3.4vw,30px); line-height:1.08; letter-spacing:-.015em; margin-bottom:6px}
+  h3{font-family:var(--sans); font-weight:700; font-size:17px; margin:22px 0 8px; color:var(--ink)}
+  p{color:var(--mut); margin:10px 0; max-width:74ch}
+  p b,li b{color:var(--ink); font-weight:600}
+  a{color:var(--ax); text-decoration:none; border-bottom:1px solid rgba(45,212,191,.3)}
+  a:hover{border-bottom-color:var(--ax)}
+  code{font-family:var(--mono); font-size:.86em; background:#0c1318; border:1px solid var(--line); border-radius:5px; padding:1px 6px; color:#bfe9e0}
+  pre{font-family:var(--mono); font-size:12.5px; line-height:1.7; background:#0b1116; border:1px solid var(--line2); border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0; color:#cfe7ee}
+  pre .add{color:var(--green)} pre .del{color:var(--red)} pre .cm{color:var(--dim)}
+
+  .pill{font-family:var(--mono); font-size:10.5px; padding:2px 9px; border-radius:999px; border:1px solid var(--line2); color:var(--mut); white-space:nowrap}
+  .pill.ax{color:var(--ax); border-color:rgba(45,212,191,.45)}
+  .pill.amber{color:var(--amber); border-color:rgba(255,180,84,.4)}
+  .pill.green{color:var(--green); border-color:var(--greenDim)}
+
+  /* hero */
+  .hero{padding-top:6px; margin-bottom:6px}
+  .hero .sub{font-size:17px; color:var(--mut); max-width:70ch; margin-top:18px}
+  .hero .sub b{color:var(--ink); font-weight:600}
+
+  /* legend */
+  .legend{border:1px solid var(--line2); border-radius:10px; padding:14px 16px; margin:18px 0; background:linear-gradient(180deg,var(--panel),var(--bg2)); display:flex; flex-direction:column; gap:9px}
+  .legend .lt{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin-bottom:2px}
+  .legend .lrow{display:flex; align-items:center; gap:11px; font-size:13.5px; color:var(--mut); flex-wrap:wrap}
+  .legend .lrow b{color:var(--ink)}
+
+  /* index */
+  .index{border:1px solid var(--line2); border-radius:10px; margin:18px 0; background:var(--panel); overflow:hidden}
+  .index a{display:flex; align-items:center; gap:11px; padding:9px 15px; border-bottom:1px solid var(--line); border-left:2px solid transparent; color:var(--mut); font-size:13.5px; text-decoration:none; transition:.16s}
+  .index a:last-child{border-bottom:0}
+  .index a:hover{background:var(--panel2); border-left-color:var(--ax); color:var(--ink)}
+  .index a .ixn{font-family:var(--mono); color:var(--dim); font-size:12px; flex:none}
+  .index a .ixt{flex:1; min-width:0}
+  .index a .pill{flex:none}
+
+  /* fix card */
+  .fix{border:1px solid var(--line2); border-radius:12px; padding:18px 20px; margin:20px 0; background:linear-gradient(180deg,var(--panel),var(--bg2)); scroll-margin-top:18px}
+  .fix .fhead{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line)}
+  .fix .fnum{font-family:var(--disp); font-weight:900; font-size:22px; color:var(--ax); line-height:1}
+  .fix .fttl{font-weight:700; color:var(--ink); font-size:16.5px; flex:1; min-width:240px; line-height:1.3}
+  .frow{margin:12px 0}
+  .flab{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin-bottom:2px}
+  .frow.fix-row .flab{color:var(--ax)}
+  .frow p{margin:2px 0; font-size:14.5px}
+  .frow .where{font-family:var(--mono); font-size:12.5px; color:var(--mut)}
+
+  /* screenshot figure + auto-swapping placeholder */
+  .shot{margin:14px 0}
+  .shot img{display:block; width:100%; border:1px solid var(--line2); border-radius:10px}
+  .shot figcaption{font-family:var(--mono); font-size:11.5px; line-height:1.5; color:var(--dim); margin-top:8px}
+  .shot .ph{display:none}
+  .shot.missing img{display:none}
+  .shot.missing figcaption{display:none}
+  .shot.missing .ph{display:block}
+  .ph{border:2px dashed var(--line2); border-radius:10px; padding:16px 18px;
+    background-color:#0c1318;
+    background-image:repeating-linear-gradient(45deg, rgba(159,180,191,.035) 0 8px, transparent 8px 18px)}
+  .ph .pheb{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); margin-bottom:8px}
+  .ph p{font-size:13.5px; margin:5px 0; color:var(--mut)}
+  .ph .tgt{font-family:var(--mono); font-size:12px; color:var(--dim); margin-top:8px}
+  .shotpair{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  @media(max-width:680px){ .shotpair{grid-template-columns:1fr} }
+
+  /* delight */
+  .delight{border:1px solid var(--greenDim); border-radius:12px; padding:16px 20px; margin:18px 0; background:linear-gradient(180deg,rgba(70,211,154,.07),transparent)}
+  .delight .dt{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--green); margin-bottom:8px; display:flex; gap:8px; align-items:center}
+  .delight ul{margin:8px 0 4px 20px; color:var(--mut)}
+  .delight li{margin:7px 0; font-size:14.5px}
+
+  .foot{margin-top:34px; padding-top:18px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12px; color:var(--dim); line-height:1.9}
+  .foot a{font-size:12px}
+  .homelink{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); text-decoration:none; border:0; margin-bottom:18px}
+  .homelink:hover{color:var(--ax)}
+  .related{margin-top:18px; border-top:1px solid var(--line); padding-top:12px}
+  .related .rgrp{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin-bottom:8px}
+  .related a{display:block; font-family:var(--mono); font-size:11.5px; color:var(--mut); text-decoration:none; border:0; padding:4px 0}
+  .related a:hover{color:var(--ax)}
+  .related a.cur{color:var(--ax)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDE NAV -->
+  <nav class="sidenav" id="sidenav">
+    <div class="navtitle">Nine fixes</div>
+    <a href="#fix-1"><span class="nn">1</span><span class="nt">Silent async-task trap</span></a>
+    <a href="#fix-2"><span class="nn">2</span><span class="nt">Version-drift in snippets</span></a>
+    <a href="#fix-3"><span class="nn">3</span><span class="nt">OpenRouter + silent $0 cost</span></a>
+    <a href="#fix-4"><span class="nn">4</span><span class="nt">Read-only prompt mirror</span></a>
+    <a href="#fix-5"><span class="nn">5</span><span class="nt">Trace detail ≠ single pane</span></a>
+    <a href="#fix-6"><span class="nn">6</span><span class="nt">SDK papercuts, first 30 min</span></a>
+    <a href="#fix-7"><span class="nn">7</span><span class="nt">Online-eval Task from code</span></a>
+    <a href="#fix-8"><span class="nn">8</span><span class="nt">Experiment evals off the trace</span></a>
+    <a href="#fix-9"><span class="nn">9</span><span class="nt">Alyx can't export transcript</span></a>
+    <div class="navfoot">
+      <a href="#delight">✦ delight</a>
+    </div>
+    <div class="related">
+      <div class="rgrp">Related pages</div>
+      <a href="proposal-v3.html">Proposal</a>
+      <a href="mocks-v3.html">UI mocks</a>
+      <a href="concept-ledger.html">Concepts considered</a>
+      <a class="cur">Quick fixes</a>
+    </div>
+  </nav>
+
+<div class="page">
+
+  <a class="homelink" href="../index.html">← Back to Index</a>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">onboarding & DX papercuts · found live during the build</div>
+    <h1>Nine quick fixes.</h1>
+    <p class="sub">Small, concrete fixes that would smooth the first hours on Arize AX — each one hit while building and instrumenting a real agent. These are <b>separate from the headline proposal</b>: not a product bet, just the papercuts that cost a developer time on day one. The raw timestamped log lives in <a href="FEEDBACK.html">FEEDBACK.html</a>; this is the readable copy, with evidence screenshots.</p>
+  </section>
+
+  <!-- LEGEND -->
+  <section>
+    <div class="legend">
+      <div class="lt">disposition — one tier per fix</div>
+      <div class="lrow"><span class="pill green">discoverability</span> <span>the capability already ships — the gap is <b>finding it</b> (docs / surfacing).</span></div>
+      <div class="lrow"><span class="pill amber">workaround → first-party</span> <span>we solved it outside the product — <b>absorb it</b> so users don't have to.</span></div>
+      <div class="lrow"><span class="pill ax">build</span> <span>a small but real <b>product gap</b> with no workaround.</span></div>
+    </div>
+  </section>
+
+  <!-- FIX 1 -->
+  <section id="fix-1">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">1</span><span class="fttl">Silent async-task trap → every eval score is 0.0 with no error</span><span class="pill ax">build</span></div>
+      <div class="frow"><div class="flab">Pain</div><p>A sync experiment task using <code>agent.run_sync()</code> fails silently inside the experiment's running event loop (<code>asyncio.run() cannot be called from a running loop</code>) → every task output is <code>None</code> → <b>all eval scores come back 0.0</b>, with nothing flagged in the run summary.</p></div>
+      <div class="frow"><div class="flab">Observed</div><p>The failure reads as "my evaluators are broken," not "my task threw." It cost real debugging time before introspecting the installed source.</p></div>
+      <pre><span class="cm"># inside experiments.run(), the sync task hits the running loop:</span>
+<span class="del">RuntimeError: asyncio.run() cannot be called from a running event loop</span>
+<span class="cm"># → task output is None for every row → judges score None → </span>
+correctness  <span class="del">0.0</span>   groundedness <span class="del">0.0</span>   relevance <span class="del">0.0</span>
+<span class="cm"># …and the run summary reports success. Nothing says "N tasks errored."</span></pre>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>Surface a first-class diagnostic in the run summary — <i>"N tasks errored, see traces"</i> — or auto-detect a sync task and run it in a worker loop. <b>A silent 0.0 is the worst possible default for a measurement tool</b> — and the seed of the Part-3 proposal: the platform should catch the silent failure <i>for</i> you.</p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Experiments / <code>experiments.run</code> quickstart.</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 2 -->
+  <section id="fix-2">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">2</span><span class="fttl">Version-drift in tracing snippets</span><span class="pill ax">build</span></div>
+      <div class="frow"><div class="flab">Pain</div><p><code>Agent(instrument=True)</code> — in many tutorials and our own references — is <b>deprecated in pydantic-ai 1.x</b>; the supported switch is <code>Agent.instrument_all(True)</code>.</p></div>
+      <pre><span class="del">- Agent(instrument=True)</span>        <span class="cm"># deprecated in pydantic-ai 1.x</span>
+<span class="add">+ Agent.instrument_all(True)</span>     <span class="cm"># supported switch</span></pre>
+      <div class="frow"><div class="flab">Observed</div><p>Had to read installed source to find the working call — a confusing first-trace miss.</p></div>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>Version-aware quickstarts — pin snippets to the installed framework version, or add a "verify against your installed version" nudge. <b>Framework-pinned snippets go stale silently.</b></p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Instrumentation quickstart (pydantic-ai integration).</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 3 -->
+  <section id="fix-3">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">3</span><span class="fttl">OpenRouter as a first-party model source (+ cost tracking)</span><span class="pill amber">workaround → first-party</span></div>
+      <div class="frow"><div class="flab">Pain</div><p>One OpenRouter key drives Claude/GPT/Gemini (great for the neutrality story), but AX treats it as a custom endpoint — and <b>cost reads $0 silently</b>: OpenRouter slugs (<code>anthropic/claude-sonnet-4</code>) don't match AX's ~63 built-in price configs, so the per-token match fails with no error and no prompt.</p></div>
+      <div class="frow"><div class="flab">Observed</div><p>Easy to mistake $0 spend for "free." The sneakiest gap — it never announces itself.</p></div>
+      <div class="shotpair">
+        <figure class="shot">
+          <img src="screenshots/qf3-cost-zero.png" alt="Trace view with the Cost column reading $0.00 against OpenRouter slugs" onerror="this.closest('.shot').classList.add('missing')" />
+          <figcaption>Cost column reads $0.00 against OpenRouter slugs — no warning that the slug failed to match a price config.</figcaption>
+          <div class="ph">
+            <div class="pheb">📸 to capture</div>
+            <p>A trace / project view with the <b>Cost</b> column reading $0.00 against OpenRouter model slugs.</p>
+            <p class="tgt">target: <code>screenshots/qf3-cost-zero.png</code></p>
+          </div>
+        </figure>
+        <figure class="shot">
+          <img src="screenshots/qf3-cost-config.png" alt="Settings, Cost Tracking, with custom cost configs added per OpenRouter slug" onerror="this.closest('.shot').classList.add('missing')" />
+          <figcaption>The workaround: custom cost configs added per slug under Settings → Cost Tracking.</figcaption>
+          <div class="ph">
+            <div class="pheb">📸 to capture</div>
+            <p>Settings → Cost Tracking showing the <b>custom cost configs</b> added per OpenRouter slug — the workaround.</p>
+            <p class="tgt">target: <code>screenshots/qf3-cost-config.png</code></p>
+          </div>
+        </figure>
+      </div>
+      <div class="frow fix-row"><div class="flab">Fix</div><p><b>Workaround we used:</b> add custom cost configs per OpenRouter slug (Settings → Cost Tracking). <b>Make it first-party:</b> native OpenRouter (and similar gateway) support so users manage fewer credentials, swap model versions easily, and get cost + model config out of the box — then leverage that gateway for experimentation. <i>Combines two build findings: model-config friction + silent cost.</i></p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Settings → Cost Tracking · model/integration setup.</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 4 -->
+  <section id="fix-4">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">4</span><span class="fttl">Manage prompts externally, mirror them read-only into AX</span><span class="pill amber">workaround → first-party</span></div>
+      <div class="frow"><div class="flab">Pain</div><p>The polished prompt-optimization / management path wants the prompt to live in <b>Prompt Hub</b> — in tension with teams that keep prompts authoritative in their own code/repo.</p></div>
+      <div class="frow"><div class="flab">Observed / verified</div><p>A <b>view-only, synced</b> representation of an externally-managed prompt does <b>not</b> break experiments, the Playground, or online evals — those are "observe/execute" tier and only need a model provider registered. Only the "own" tier (Hub versioning, one-click rollback, the UI optimization path) is forfeited. Arize's own docs call the Hub requirement "a UI-surface choice, not a technical constraint."</p></div>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>A first-class <b>read-only prompt mirror</b> — sync the in-repo prompt into AX for visibility and eval/experiment association, without making AX the authoritative store. The repo stays the master; <b>AX experiments run as permutations of it</b> — swap the model, tweak params, A/B a variant against the mirrored baseline — and the results flow back without AX ever owning the source of truth. Balances portability against the experimentation surface.</p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Prompt Hub / prompt-learning docs.</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 5 -->
+  <section id="fix-5">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">5</span><span class="fttl">Trace detail isn't a single pane of glass</span><span class="pill ax">build</span></div>
+      <div class="frow"><div class="flab">Pain</div><p>The job of the trace detail view is to let you <b>understand what happened as fast as possible</b> — read the input and output of every step, top to bottom, without detective work. Today a few things break that scan. The one that matters most: <b>a step's real output is often hidden</b>, so the waterfall reads as if a step produced nothing when it actually did.</p></div>
+      <div class="frow"><div class="flab">Failure mode A — a tool step's output is buried</div><p>When a span is a tool call, the main <b>Output</b> area renders empty and the actual result is parked under <b>Attributes</b>. The default view implies the step produced nothing — exactly the opposite of what you opened the trace to confirm.</p></div>
+      <div class="shotpair">
+        <figure class="shot">
+          <img src="screenshots/qf5-tool-empty.png" alt="Tool-call span with empty Output area and the real result under Attributes" onerror="this.closest('.shot').classList.add('missing')" />
+          <figcaption>The symptom: a tool-call span's Output area is empty while the real result sits under Attributes.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="screenshots/qf5-attr-taxonomy.png" alt="Alyx explaining the tool result lands in a different attribute than the Output pane reads" onerror="this.closest('.shot').classList.add('missing')" />
+          <figcaption>The root cause, per Alyx: the result exists but lands in a <i>different attribute</i> (<code>output.value</code> is null; <code>finish_reason: tool_call</code>) than the Output pane renders — an output-type vs. output-value mapping gap, not a styling miss.</figcaption>
+        </figure>
+      </div>
+      <div class="frow"><div class="flab">Failure mode B — panes aren't reliably side-scrollable</div><p>The detail panes render zoomed-out and only sometimes scroll horizontally, with no cue either way — so it's easy to read a pane as complete and miss a value parked off to the right. In a debugging tool, content you can't tell is there is content you'll miss.</p></div>
+      <figure class="shot">
+        <img src="screenshots/qf5-overflow.png" alt="Span detail pane with content cut off at the right edge and no scroll cue" onerror="this.closest('.shot').classList.add('missing')" />
+        <figcaption>An incomplete set of headers with no obvious side-scroll — the right edge is silently cut off.</figcaption>
+      </figure>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>Make input → output legible at every step. <b>Promote the tool name, args, and return into the primary Output pane</b> for tool/retriever spans (for those spans the OpenInference attributes <i>are</i> the output) — which means fixing the output-type/value mapping so a tool result is recognized as output, not parked in Attributes. And let long values wrap/expand by default, or carry an explicit overflow cue. <b>Target: read plan → tool → result → eval top-to-bottom</b> without opening Attributes or guessing at a hidden scroll.</p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Trace / span detail view · OpenInference output attribute mapping.</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 6 -->
+  <section id="fix-6">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">6</span><span class="fttl">SDK papercuts in the first 30 minutes</span><span class="pill ax">build</span></div>
+      <div class="frow"><div class="flab">Pain</div><p><code>datasets.get(dataset=&lt;name&gt;)</code> (not <code>name=</code>); space passed per-call (not on the client); uploaded columns land under <code>additional_properties</code>; dataset name collisions throw a raw 409 <code>ConflictException</code>.</p></div>
+      <pre>datasets.get(dataset=&lt;name&gt;)   <span class="cm"># not name=</span>
+<span class="cm"># dataset name collision →</span>
+ConflictException: 409          <span class="cm"># raw, no get_or_create path</span></pre>
+      <div class="frow"><div class="flab">Observed</div><p>Introspecting installed source was faster than the docs; partly BETA surface.</p></div>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>A <code>get_or_create(..., exist_ok=True)</code> dataset helper and a supported-Python-versions note would remove the sharpest early papercuts.</p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Datasets SDK reference.</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 7 -->
+  <section id="fix-7">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">7</span><span class="fttl">Online-eval Tasks from the SDK — exists, but undiscoverable</span><span class="pill green">discoverability</span></div>
+      <div class="frow"><div class="flab">Pain</div><p>Wiring an online-eval <b>Task</b> from code wasn't obvious — <code>arize.tasks</code> / <code>arize.evaluators</code> clients exist but aren't documented for this path; the surface is UI-first.</p></div>
+      <div class="frow"><div class="flab">Observed</div><p>The capability ships; the gap is purely <b>discoverability</b> for the code path. The route that works — found by reading the CLI, not the docs:</p></div>
+      <pre><span class="cm"># works from code today — just not in the online-evals docs:</span>
+ax tasks create-evaluation --project dev-research-assistant \
+   --evaluator &lt;id&gt; --no-continuous   <span class="cm"># create the Task</span>
+ax tasks trigger-run --task &lt;id&gt;        <span class="cm"># run it over existing traces</span>
+<span class="cm"># the underlying arize.tasks / arize.evaluators Python clients</span>
+<span class="cm"># exist too — also undocumented for this path.</span></pre>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>Document the SDK/CLI route to create &amp; trigger an online-eval Task alongside the UI flow — surface <code>ax tasks</code> and the <code>arize.tasks</code>/<code>arize.evaluators</code> clients in the online-evals docs.</p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Online Evals / Tasks docs.</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 8 -->
+  <section id="fix-8">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">8</span><span class="fttl">Experiment eval scores never make it onto the trace</span><span class="pill ax">build</span></div>
+      <div class="frow"><div class="flab">Pain</div><p>When I review an <b>experiment</b>, the eval verdicts show up on the experiment results view (the red/green labels in the compare table). But those verdicts are <b>never written onto the trace</b> — so when I open a trace from that experiment, its <b>Evals tab is empty</b>. If we want people debugging in the trace, the evals have to be on that screen too.</p></div>
+      <figure class="shot">
+        <img src="screenshots/qf8-experiment-evals.png" alt="Experiment compare view showing eval verdicts that don't appear on the trace" onerror="this.closest('.shot').classList.add('missing')" />
+        <figcaption>Verdicts live on the experiment results view — but open the underlying trace and its Evals tab is empty.</figcaption>
+      </figure>
+      <div class="frow"><div class="flab">Confirmed with Alyx (2026-06-13)</div><p><i>"Experiment eval scores are stored on the experiment run record, not written back onto the trace spans."</i> So it's deliberate — but the intent optimizes for the compare table, not the person debugging the trace.</p></div>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>Surface experiment eval verdicts on the <b>trace's Evals tab</b> — the same place production evals already appear — with a flag marking them experiment-sourced. Keep them on the compare table too; this is <b>additive, not a move</b>. The same evaluator already attaches to both a dataset and a tracing project, so the score is computed identically — the gap is purely that experiment scores aren't surfaced on the experiment's own traces.</p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Experiments → compare table → Trace link · trace/span detail <b>Evals tab</b>.</p></div>
+      <div class="frow"><div class="flab">Sibling of #5</div><p>Both sit under the <b>single-pane-of-glass</b> theme: #5 is "the payload is hidden within one span," #8 is "the eval verdict lives on a different screen than the trace." Kept apart because the fixes are different.</p></div>
+    </div>
+  </section>
+
+  <!-- FIX 9 -->
+  <section id="fix-9">
+    <div class="fix">
+      <div class="fhead"><span class="fnum">9</span><span class="fttl">Alyx can't export its own transcript</span><span class="pill ax">build</span></div>
+      <div class="frow"><div class="flab">Pain</div><p>Arize's in-product assistant (Alyx) can't save or export a conversation — <i>"I don't have a tool to save this to a file… that's a limitation of the current chat interface."</i> The only options are manual copy/paste, screenshot, or browser print-to-PDF.</p></div>
+      <div class="frow"><div class="flab">Observed</div><p>This surfaced <i>because</i> the Alyx exchange in #8 was worth keeping — users mine these conversations for answers and then carry them into other tools (a Claude Code session, a doc, a ticket). When the assistant can't hand you the transcript, that handoff is lossy and manual.</p></div>
+      <figure class="shot">
+        <img src="screenshots/qf9-alyx-export.png" alt="Alyx saying it can't save or export the conversation, only manual copy/screenshot/print" onerror="this.closest('.shot').classList.add('missing')" />
+        <figcaption>Alyx, asked to save the transcript: <i>"I don't have a way to save this… select all the text and copy/paste, take a screenshot, or use your browser's print function… Sorry, I can't do a one-click export."</i></figcaption>
+      </figure>
+      <div class="frow fix-row"><div class="flab">Fix</div><p>A one-click <b>Export / Copy transcript</b> (markdown or PDF) on the Alyx panel. Cheap, and it turns Alyx answers into reusable artifacts instead of throwaway chat.</p></div>
+      <div class="frow"><div class="flab">Where</div><p class="where">Alyx / in-product assistant chat panel.</p></div>
+    </div>
+  </section>
+
+  <!-- DELIGHT -->
+  <section id="delight">
+    <div class="delight">
+      <div class="dt">✦ delight, for balance — what already felt great</div>
+      <ul>
+        <li>Trace landing in ~3 lines (<code>register()</code> + <code>Agent.instrument_all(True)</code>) with a real waterfall on the first try.</li>
+        <li>One OpenRouter key → Claude ↔ GPT ↔ Gemini; the provider-neutral story is real and trivial to set up.</li>
+        <li>One <code>experiments.run()</code> gives per-row outputs + multi-judge scores; <code>dry_run</code> is a genuine safety net.</li>
+        <li>The ingest key authorized both tracing <b>and</b> the experiments SDK — no separate developer-key hunt.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    Source: <a href="FEEDBACK.html">FEEDBACK.html</a> — the raw, as-it-happened onboarding-friction log this page distills.<br/>
+    → <a href="proposal-v3.html">From Signal to Decisions (Part-3 proposal)</a> · → <a href="concept-ledger.html">Appendix: concepts considered</a>
+  </div>
+
+</div><!-- /.page -->
+</div><!-- /.shell -->
+
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lb"><span class="lb-hint">click / esc to close</span><img id="lb-img" alt="" /></div>
+
+<script>
+(function(){
+  // Lightbox: click any screenshot to view full-size
+  var lb = document.getElementById('lb'), lbImg = document.getElementById('lb-img');
+  document.querySelectorAll('.shot img').forEach(function(img){
+    img.addEventListener('click', function(){
+      lbImg.src = img.currentSrc || img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+    });
+  });
+  lb.addEventListener('click', function(){ lb.classList.remove('open'); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') lb.classList.remove('open'); });
+
+  // Scroll-spy: highlight the active fix in the side nav
+  var links = {};
+  document.querySelectorAll('.sidenav a[href^="#fix-"]').forEach(function(a){
+    links[a.getAttribute('href').slice(1)] = a;
+  });
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        Object.values(links).forEach(function(a){ a.classList.remove('active'); });
+        var a = links[en.target.id];
+        if(a) a.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-10% 0px -70% 0px', threshold:0});
+  document.querySelectorAll('section[id^="fix-"]').forEach(function(s){ spy.observe(s); });
+})();
+</script>
+</body>
+</html>

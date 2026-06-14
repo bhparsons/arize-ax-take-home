@@ -1,0 +1,96 @@
+[
+  {
+    "question": "How do I send traces from a Pydantic AI agent to Arize?",
+    "expected_keypoints": [
+      "call register() from arize.otel",
+      "pass OpenInferenceSpanProcessor",
+      "enable Agent.instrument_all(True)"
+    ]
+  },
+  {
+    "question": "What is the difference between Phoenix and Arize AX?",
+    "expected_keypoints": [
+      "Phoenix is open-source / free",
+      "AX is the commercial platform",
+      "both ingest the same OpenInference/OTel traces",
+      "AX adds Prompt Playground and online evals"
+    ]
+  },
+  {
+    "question": "How do I enable Pydantic AI instrumentation for OpenTelemetry?",
+    "expected_keypoints": [
+      "Agent.instrument_all(True)",
+      "the old Agent(instrument=True) kwarg is deprecated in 1.x"
+    ]
+  },
+  {
+    "question": "What does an LLM-as-a-judge evaluation measure for an agent?",
+    "expected_keypoints": [
+      "groundedness / hallucination",
+      "correctness against expected key points",
+      "tool/function-calling correctness"
+    ]
+  },
+  {
+    "question": "How do I run an experiment with an evaluator?",
+    "expected_keypoints": [
+      "create or upload a dataset",
+      "define a task that runs the agent",
+      "pass evaluators",
+      "dry_run first to catch shape errors"
+    ]
+  },
+  {
+    "question": "What is the difference between a dataset and an experiment?",
+    "expected_keypoints": [
+      "a dataset is a versioned set of examples",
+      "an experiment runs a task over the dataset and applies evaluators",
+      "every run is recorded so runs can be compared"
+    ]
+  },
+  {
+    "question": "How do I switch the agent's model provider from Claude to GPT?",
+    "expected_keypoints": [
+      "Pydantic AI is model-agnostic",
+      "point an OpenAI-compatible model at OpenRouter",
+      "change the model slug, no agent code changes"
+    ]
+  },
+  {
+    "question": "Which package instruments Pydantic AI for OpenInference?",
+    "expected_keypoints": [
+      "openinference-instrumentation-pydantic-ai"
+    ]
+  },
+  {
+    "question": "How do I send traces to Phoenix instead of Arize AX?",
+    "expected_keypoints": [
+      "use phoenix.otel.register instead of arize.otel.register",
+      "the agent and eval code is otherwise identical",
+      "only the register() block differs"
+    ]
+  },
+  {
+    "question": "What span kinds appear in the trace waterfall for this agent?",
+    "expected_keypoints": [
+      "AGENT span at the top",
+      "nested LLM spans",
+      "TOOL spans",
+      "RETRIEVER span for doc_lookup"
+    ]
+  },
+  {
+    "question": "How do I deploy this agent to Kubernetes with horizontal autoscaling?",
+    "expected_keypoints": [
+      "the local docs do not cover deployment / Kubernetes",
+      "the agent should say so rather than fabricate"
+    ]
+  },
+  {
+    "question": "What is the exact monthly price of the Arize AX enterprise tier?",
+    "expected_keypoints": [
+      "the docs do not contain pricing",
+      "the agent should decline to invent a number"
+    ]
+  }
+]

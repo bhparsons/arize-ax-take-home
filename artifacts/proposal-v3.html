@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>From Signal to Decisions · Arize AX proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e12; --bg2:#0d1419; --panel:#121b22; --panel2:#16212a;
+    --line:#22303a; --line2:#2c3e4a;
+    --ink:#e8eff2; --mut:#9fb4bf; --dim:#647a85;
+    --green:#46d39a; --greenDim:#1f6b50; --amber:#ffb454; --red:#ff6b6b;
+    --ax:#2dd4bf; --axGlow:rgba(45,212,191,.10);
+    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif; --disp:'Fraunces',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(34,48,58,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(34,48,58,.18) 1px,transparent 1px); background-size:34px 34px;}
+  .wrap{display:grid; grid-template-columns:268px 1fr; max-width:1280px; margin:0 auto; min-height:100vh}
+  aside{position:sticky; top:0; height:100vh; overflow-y:auto; border-right:1px solid var(--line); padding:26px 20px 40px; background:rgba(10,14,18,.6)}
+  .brand{font-family:var(--disp); font-weight:900; font-size:21px; line-height:1.05; letter-spacing:-.01em; margin-bottom:4px}
+  .brand .ax{color:var(--ax)}
+  .brandsub{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:22px}
+  nav a{display:block; font-size:13.5px; color:var(--mut); text-decoration:none; padding:6px 10px; border-radius:6px; border-left:2px solid transparent; transition:.18s}
+  nav a:hover{color:var(--ink); background:var(--panel)}
+  nav a.on{color:var(--ax); border-left-color:var(--ax); background:var(--axGlow)}
+  nav .grp{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:18px 0 6px 10px}
+  .related{margin-top:18px; border-top:1px solid var(--line); padding-top:12px}
+  .related .rgrp{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin-bottom:8px}
+  .related a{display:block; font-family:var(--mono); font-size:11.5px; color:var(--mut); text-decoration:none; border:0; padding:4px 0}
+  .related a:hover{color:var(--ax)}
+  .related a.cur{color:var(--ax)}
+  main{padding:clamp(28px,4vw,64px) clamp(22px,4vw,72px); max-width:940px}
+  section{padding-top:30px; margin-bottom:30px; border-bottom:1px solid var(--line); padding-bottom:34px; scroll-margin-top:18px}
+  section:last-child{border-bottom:0}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ax); display:flex; align-items:center; gap:9px; margin-bottom:12px}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--ax)}
+  h1{font-family:var(--disp); font-weight:900; font-size:clamp(34px,5.4vw,58px); line-height:1.0; letter-spacing:-.02em}
+  h2{font-family:var(--disp); font-weight:600; font-size:clamp(25px,3.4vw,38px); line-height:1.06; letter-spacing:-.015em; margin-bottom:6px}
+  h3{font-family:var(--sans); font-weight:700; font-size:19px; margin:24px 0 8px; color:var(--ink)}
+  h4{font-family:var(--mono); font-weight:600; font-size:13px; letter-spacing:.04em; color:var(--ax); margin:18px 0 6px}
+  p{color:var(--mut); margin:10px 0; max-width:74ch}
+  p b,li b{color:var(--ink); font-weight:600}
+  a{color:var(--ax); text-decoration:none; border-bottom:1px solid rgba(45,212,191,.3)}
+  a:hover{border-bottom-color:var(--ax)}
+  ul,ol{color:var(--mut); margin:10px 0 10px 22px; max-width:74ch}
+  li{margin:6px 0}
+  code{font-family:var(--mono); font-size:.88em; background:#0c1318; border:1px solid var(--line); border-radius:5px; padding:1px 6px; color:#bfe9e0}
+  pre{font-family:var(--mono); font-size:12.5px; line-height:1.65; background:#0b1116; border:1px solid var(--line2); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:14px 0; color:#cfe7ee}
+  .box{border:1px solid var(--line2); border-radius:10px; padding:15px 18px; margin:16px 0; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .box .bt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px; display:flex; gap:8px; align-items:center}
+  .box p{margin:4px 0}
+  .box.gotcha{border-color:rgba(255,180,84,.4); background:linear-gradient(180deg,rgba(255,180,84,.06),transparent)} .box.gotcha .bt{color:var(--amber)}
+  .box.tip{border-color:rgba(45,212,191,.4); background:linear-gradient(180deg,var(--axGlow),transparent)} .box.tip .bt{color:var(--ax)}
+  .box.why{border-color:var(--line2)} .box.why .bt{color:var(--mut)}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14px}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+  td{color:var(--mut)} td b{color:var(--ink)}
+  .pill{font-family:var(--mono); font-size:10.5px; padding:2px 8px; border-radius:999px; border:1px solid var(--line2); color:var(--mut); white-space:nowrap}
+  .pill.ax{color:var(--ax); border-color:rgba(45,212,191,.45)}
+  .pill.amber{color:var(--amber); border-color:rgba(255,180,84,.4)}
+  .pill.green{color:var(--green); border-color:var(--greenDim)}
+  .tagrow{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0}
+  .tag{font-family:var(--mono); font-size:11px; padding:3px 10px; border-radius:999px; border:1px solid var(--line2); color:var(--mut)}
+  /* trust-ladder roadmap */
+  .rsub{color:var(--mut); margin:6px 0 4px; font-size:14.5px}
+  .rsub b{color:var(--ink); font-weight:600}
+  .ladder{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0 4px}
+  .rung{display:flex; flex-direction:column; border:1px solid var(--line2); border-top-width:2px; border-radius:10px; padding:14px 15px 6px; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .rung.v1{border-top-color:var(--green)} .rung.v2{border-top-color:var(--ax)} .rung.v3{border-top-color:var(--amber)}
+  .rung .rv{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase}
+  .rung.v1 .rv{color:var(--green)} .rung.v2 .rv{color:var(--ax)} .rung.v3 .rv{color:var(--amber)}
+  .rung .rname{font-weight:600; font-size:15px; color:var(--ink); margin:2px 0 8px}
+  .rung .rt{font-size:13px; line-height:1.55; color:var(--mut); margin-bottom:11px}
+  .rung .rt b{color:var(--ink); font-weight:600}
+  .rung ul{list-style:none; margin:auto 0 0; padding:9px 0 0; border-top:1px solid var(--line)}
+  .rung li{font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.75; padding-left:14px; position:relative}
+  .rung li::before{content:"›"; position:absolute; left:0; color:var(--line2)}
+  @media(max-width:760px){.ladder{grid-template-columns:1fr}}
+  .foot{margin-top:30px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+
+  /* hero */
+  .hero{padding-top:14px}
+  .kicker{font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:18px}
+  .hero .sub{font-size:20px; color:var(--ink); max-width:64ch; margin-top:18px}
+  .hero .sub b{color:var(--ax); font-weight:600}
+
+  /* gaps trio */
+  .gaps{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0}
+  @media(max-width:760px){ .gaps{grid-template-columns:1fr} }
+  .gap{border:1px solid var(--line2); border-radius:10px; padding:14px 15px; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .gap .gn{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ax); margin-bottom:6px}
+  .gap .gt{font-weight:700; color:var(--ink); font-size:15px; line-height:1.3}
+  .gap p{margin:7px 0 0; font-size:13.5px}
+
+  /* the loop diagram */
+  .loop{border:1px solid var(--line2); border-radius:12px; padding:18px; margin:18px 0; background:var(--panel); overflow-x:auto}
+  .loop .objbar{border:1px solid rgba(45,212,191,.45); border-radius:9px; padding:10px 14px; background:linear-gradient(180deg,var(--axGlow),transparent); text-align:center; font-family:var(--mono); font-size:12px; color:var(--ink); margin-bottom:8px}
+  .loop .objbar b{color:var(--ax)}
+  .loop .objbar .vsn{color:var(--dim); font-size:10.5px}
+  .loop .arrows{display:flex; justify-content:space-between; padding:0 8%; font-family:var(--mono); font-size:11px; color:var(--dim); margin-bottom:6px}
+  .loop .arrows .up{color:var(--amber)}
+  .loop .arrows .dn{color:var(--ax)}
+  .loop .chain{display:flex; align-items:stretch; gap:8px; min-width:640px}
+  .loop .step{flex:1; border:1px solid var(--line2); border-radius:9px; padding:11px 12px; background:linear-gradient(180deg,var(--panel2),var(--bg2))}
+  .loop .step .sh{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ax); margin-bottom:4px}
+  .loop .step p{margin:0; font-size:12.5px; line-height:1.5}
+  .loop .larr{align-self:center; color:var(--dim); font-family:var(--mono); font-size:16px}
+  .loop .back{font-family:var(--mono); font-size:11px; color:var(--amber); text-align:center; margin-top:10px}
+
+  /* decision artifact card */
+  .issue{border:1px solid var(--line2); border-radius:12px; overflow:hidden; margin:18px 0; background:var(--panel)}
+  .issue .top{display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); background:var(--panel2); flex-wrap:wrap}
+  .issue .dot{width:9px; height:9px; border-radius:50%; background:var(--amber); flex:none; box-shadow:0 0 0 3px rgba(255,180,84,.15)}
+  .issue .ttl{font-weight:700; color:var(--ink); font-size:15.5px; flex:1; min-width:240px}
+  .issue .meta{padding:14px 16px; display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  @media(max-width:680px){ .issue .meta{grid-template-columns:1fr} }
+  .issue .cell .cl{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:3px}
+  .issue .cell .cv{color:var(--mut); font-size:14px}
+  .issue .cell .cv b{color:var(--ink)}
+  .issue .res{margin:0 16px 16px; border:1px solid rgba(45,212,191,.4); border-radius:9px; padding:12px 14px; background:linear-gradient(180deg,var(--axGlow),transparent)}
+  .issue .res .rl{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--ax); margin-bottom:4px}
+  .issue .res .rv{color:var(--ink); font-size:14.5px}
+  .impact{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+  .impact .chip{font-family:var(--mono); font-size:11px; padding:3px 9px; border-radius:6px; border:1px solid var(--line2); color:var(--mut)}
+  .impact .chip b{color:var(--green)}
+  .impact .chip.guard b{color:var(--amber)}
+
+  /* principles */
+  .prins{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0}
+  @media(max-width:680px){ .prins{grid-template-columns:1fr} }
+  .prin{border:1px solid var(--line2); border-radius:10px; padding:13px 15px; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .prin .pn{font-family:var(--mono); font-size:11px; color:var(--ax); margin-bottom:4px}
+  .prin .pt{font-weight:700; color:var(--ink); font-size:15px}
+  .prin p{margin:6px 0 0; font-size:13.5px}
+
+  .seam{font-family:var(--mono); font-size:12.5px; line-height:1.8; background:#0b1116; border:1px solid var(--line2); border-radius:10px; padding:16px 18px; color:#cfe7ee; overflow-x:auto}
+  .seam .oss{color:var(--green)} .seam .axb{color:var(--ax)} .seam .cm{color:var(--dim)}
+
+  /* appendix collapsibles */
+  details.apx{border:1px solid var(--line2); border-radius:10px; margin:12px 0; background:linear-gradient(180deg,var(--panel),var(--bg2)); overflow:hidden}
+  details.apx>summary{cursor:pointer; list-style:none; padding:13px 16px; font-family:var(--mono); font-size:12.5px; letter-spacing:.04em; color:var(--ax); display:flex; align-items:center; gap:9px}
+  details.apx>summary::-webkit-details-marker{display:none}
+  details.apx>summary::before{content:"▸"; color:var(--dim); transition:.18s}
+  details.apx[open]>summary::before{content:"▾"; color:var(--ax)}
+  details.apx>summary:hover{color:var(--ink)}
+  details.apx>summary .sm{color:var(--dim); font-weight:400; margin-left:auto; text-transform:none; letter-spacing:0}
+  details.apx .apxbody{padding:6px 16px 16px; border-top:1px solid var(--line)}
+  details.apx .apxbody>p:first-child{margin-top:12px}
+  details.apx table{margin:10px 0} details.apx pre{margin:10px 0}
+
+  @media(max-width:860px){ .wrap{grid-template-columns:1fr} aside{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)} }
+  .homelink{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); text-decoration:none; border:0; margin-bottom:18px}
+  .homelink:hover{color:var(--ax)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <aside>
+    <a class="homelink" href="../index.html">← Back to Index</a>
+    <div class="brand">From Signal<br><span class="ax">to Decisions</span></div>
+    <div class="brandsub">Arize AX · Part-3 proposal</div>
+    <nav id="nav">
+      <div class="grp">Frame</div>
+      <a href="#goal">The ask</a>
+      <a href="#problem">What's solved / what isn't</a>
+      <a href="#thesis">The thesis</a>
+      <div class="grp">The bet</div>
+      <a href="#concept">Three layers + a loop</a>
+      <a href="#decisions">Decisions, the engine</a>
+      <a href="#example">Walkthrough</a>
+      <div class="grp">Make it real</div>
+      <a href="#mvp">MVP principles</a>
+      <a href="#metrics">Metrics</a>
+      <a href="#risks">Risks &amp; roadmap</a>
+      <a href="#appendix">Appendix &amp; spec</a>
+    </nav>
+    <div class="related">
+      <div class="rgrp">Related pages</div>
+      <a class="cur">Proposal</a>
+      <a href="mocks-v3.html">UI mocks</a>
+      <a href="concept-ledger.html">Concepts considered</a>
+      <a href="quick-fixes.html">Quick fixes</a>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- HERO / GOAL -->
+    <section id="goal" class="hero">
+      <div class="kicker">Part-3 product proposal · Blake Parsons · 2026-06-12</div>
+      <h1>Finding what broke<br/>is table stakes.<br/><span style="color:var(--ax)">The job is moving the<br/>business outcome.</span></h1>
+      <p class="sub">Signal, LangSmith Engine, and Raindrop all <i>find</i> agent failures now — that's table stakes. The unclaimed job is the one that matters: making the agent better <b>for the business</b>, not just better-behaved. An eval score is only a <b>proxy for the agent's true objective function</b> — the business outcome it exists to move. Arize should instrument that outcome, rank every issue by what fixing it is worth, route the decision to whoever can ship it, and close it only when the metric actually moved.</p>
+      <div class="tagrow" style="margin-top:20px">
+        <span class="tag">an eval is a proxy — the outcome is the objective</span>
+        <span class="tag">find → decide → verify the metric moved</span>
+        <span class="tag">builds on Signal, doesn't re-pitch it</span>
+        <span class="tag">self-serve from day one</span>
+      </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section id="problem">
+      <div class="eyebrow">what's solved, and what isn't</div>
+      <h2>Finding the issue is table stakes. The business outcome isn't.</h2>
+      <p>Arize launched <b>Signal</b> this spring; LangSmith Engine and Raindrop shipped the same shape. They all cluster failures into ranked issues with proposed fixes — so <b>finding the issue is now table stakes.</b> What none of them owns is the harder, more valuable thing: making the agent better <i>for the business</i>. Three gaps sit between a found issue and a moved metric:</p>
+      <div class="gaps">
+        <div class="gap"><div class="gn">gap 1 · the objective function</div><div class="gt">An eval scores the agent, not the business.</div><p>Evals measure <b>LLM behavior</b> — was the turn grounded, was it correct. That's a proxy. It can read green while the business objective fails: a support eval can rate every turn "correct" and the order still never gets delivered. Nothing today ranks issues by the <b>true objective function</b> — the outcome the agent exists to move.</p></div>
+        <div class="gap"><div class="gn">gap 2 · the decision</div><div class="gt">The fixes that matter live outside the repo.</div><p>The expensive failures aren't prompt diffs — they're a <b>missing capability, a missing permission, a blocking policy</b>, owned by someone who isn't the engineer. Getting that decided and implemented is the bottleneck. Today the handoff is a Slack screenshot; the decision stalls and nothing tracks why.</p></div>
+        <div class="gap"><div class="gn">gap 3 · the proof</div><div class="gt">Nothing tracks the balanced outcome.</div><p>Ship → re-measure → attribute is manual everywhere. And no product checks the change against the <b>balanced</b> objective — did the north-star move <i>without</i> tripping a counter-metric — which is what tells you whether to keep the change or <b>roll it back</b>.</p></div>
+      </div>
+      <p>Closing those three is how Arize stops being the place you <i>watch</i> your agent and becomes the place you <i>improve its business impact</i>. And it's buildable on the <b>self-serve tier</b> — where the developers this assignment asks about actually live, and where no automated improvement loop reaches them today.</p>
+    </section>
+
+    <!-- THESIS -->
+    <section id="thesis">
+      <div class="eyebrow">the thesis</div>
+      <h2>An eval is an approximation of the true objective function. The objective function is a business outcome.</h2>
+      <p>Every eval is a stand-in for what you actually want — and the gap between "the eval passed" and "the business won" is exactly where agents quietly fail. Observability that ends at the LLM boundary can <i>describe</i> the agent; only observability grounded in the real outcome can <i>improve</i> it. Arize should own the loop from <b>outcome → objective-ranked issue → decision made → verified lift</b>, and become accountable for whether the agent got better <i>for the business</i> — not just informed about what it did.</p>
+      <div class="box tip"><div class="bt">◆ why Arize, why now</div>
+        <p><b>Arize is the neutral party — that's real leverage.</b> An outcome convention on OpenInference is a standard only the neutral player can credibly propose; anyone else's is a framework feature. That's not a moat by itself, but it's genuine control over where the standard goes — the same position that made OpenInference stick. <b>Signal validated the direction</b> (the "AI Factory" arc is now Arize's flagship), and this is its accountability layer. And <b>the bottleneck moved from building to deciding:</b> coding agents made fixes cheap to draft; what's expensive now is getting the change decided, shipped by the right owner, and proven. That's organizational throughput — an empty product surface.</p>
+      </div>
+      <div class="box why"><div class="bt">▣ where the objective earns its keep — experiments</div>
+        <p>A north-star plus its counter-metrics isn't just for ranking issues. It's the frame that makes an <b>experiment</b> mean something: when you ship a change and re-run, the objective is what lets you <b>isolate the change's true impact</b> — did the north-star move, and did you trip a constraint doing it? Without a declared objective, an experiment is a number with no verdict.</p>
+      </div>
+    </section>
+
+    <!-- CONCEPT -->
+    <section id="concept">
+      <div class="eyebrow">the concept</div>
+      <h2>Three layers and a loop.</h2>
+      <div class="loop">
+        <div class="objbar"><b>THE OBJECTIVE</b> · purpose · north-star · constraints <span class="vsn">— versioned, revisable</span></div>
+        <div class="arrows"><span class="up">▲ revision signal (decisions that deviate)</span><span class="dn">▼ ranks every issue</span></div>
+        <div class="chain">
+          <div class="step"><div class="sh">① Outcomes</div><p>Business results joined to sessions — emitted events or a warehouse join. The ground truth.</p></div>
+          <div class="larr">→</div>
+          <div class="step"><div class="sh">② Issues</div><p>From Signal where available; eval-signature clustering self-serve. The finder is interchangeable.</p></div>
+          <div class="larr">→</div>
+          <div class="step"><div class="sh">③ Decisions</div><p>Recommendation + evidence + tradeoffs, routed to the owner who can ship it. Status tracked.</p></div>
+          <div class="larr">→</div>
+          <div class="step"><div class="sh">④ Verified lift</div><p>Re-measure post-ship. Close on movement — or learn from the deviation.</p></div>
+        </div>
+        <div class="back">declines &amp; deviations flow back ⟲ — the loop calibrates the objective, not just the agent</div>
+      </div>
+
+      <h3>① Ground — Outcomes</h3>
+      <p>At onboarding, one more question next to "instrument your spans": <b>"how do you know a session worked?"</b> Two paths, one schema — <b>emit</b> an <code>outcome</code> event post-hoc from the system that knows the truth (<code>outcome.name</code> · <code>outcome.status</code> · <code>outcome.value</code>, joined by <code>session.id</code>), or <b>join</b> a warehouse table for orgs that won't re-instrument. The outcome often lands <i>after</i> the agent is done — the agent resolves the chat in seconds; "order delivered / reopened in 72h" is known minutes or days later — so outcomes attach post-hoc, on their own clock. Spec'd as an <b>open OpenInference extension</b> (PRD Appendix A), so it's infrastructure, not lock-in. This is also where every "projected impact" number gets its legitimacy: <b>the business metrics are instrumented, not imagined.</b></p>
+
+      <h3>② Lens — the Objective</h3>
+      <p>A 5-minute setup that becomes the product's center of gravity: <b>purpose</b> (one sentence) · <b>north-star</b> (one outcome-derived metric) · <b>constraints</b> (the counter-metrics that must not get worse while chasing it — named "constraints" because <i>Guardrails</i> is an existing AX runtime feature, and this isn't that). Every issue is ranked by <b>projected north-star lift net of constraint risk</b> — always labeled a <b>ceiling</b>, never a point estimate. And the objective is <b>versioned and revisable by the loop itself:</b> when the org declines a recommendation for a reason the objective didn't know ("that quota is a fraud control"), the decline proposes a new constraint. The objective gets truer with every decision.</p>
+      <div class="box tip"><div class="bt">◆ where this goes — business context for a balanced objective</div>
+        <p>Setting the objective is the natural place to capture <b>broader business context</b> — what the org actually trades off, what a "win" costs elsewhere. That context is what lets <b>Alyx</b> pressure-test an objective for completeness: is the north-star paired with the right counter-metrics, or is the agent being pushed to optimize one number into a wall? <span style="color:var(--dim)">(A direction the record makes possible — not the MVP. V1 just captures purpose, north-star, and constraints.)</span></p>
+      </div>
+    </section>
+
+    <!-- DECISIONS -->
+    <section id="decisions">
+      <div class="eyebrow">the engine</div>
+      <h2>③ Decisions — from recommendation to shipped, owned, and proven.</h2>
+      <p>The unit of value isn't a score, and it isn't even a fix suggestion — it's a <b>decision that gets made.</b> Each issue maps to a change type, and the change type determines the route and the verb:</p>
+      <table>
+        <tr><th>Change type</th><th>Example</th><th>Routes to</th><th>CTA</th></tr>
+        <tr><td><b>Prompt</b></td><td>Tighten the refusal instruction</td><td>engineer</td><td>open PR</td></tr>
+        <tr><td><b>Context</b></td><td>Refund-policy doc missing</td><td>knowledge owner</td><td>add doc</td></tr>
+        <tr><td><b>Tool</b></td><td>Can't evaluate delivery photos → <b>drafted tool spec</b></td><td>engineering</td><td>review spec</td></tr>
+        <tr><td><b>Permission</b></td><td>Credits &gt;$20 always escalate</td><td>platform / risk owner</td><td>route artifact</td></tr>
+        <tr><td><b>Policy</b></td><td>Quota blocks correct reasoning</td><td>policy owner</td><td>route artifact</td></tr>
+        <tr><td><b>Communication</b></td><td>Correct but verbose</td><td>product / design</td><td>edit config</td></tr>
+      </table>
+      <h3>The Decision Artifact — built from what we already know</h3>
+      <p>The V1 artifact deliberately leans on data the platform already has, not on intelligence it has to invent: <b>how often is this happening</b> (cluster size, share of volume), <b>what we observe</b> — both the failing evals <i>and</i> the joined outcome — and the <b>tradeoff</b> (north-star upside <i>and</i> the constraint it puts at risk). That compiles into a shareable package routed to an owner, viewable by link without a login (the policy owner isn't an AX user — yet), carrying a status: <code>proposed → routed → decided (shipped / declined / blocked) → verified / deviated</code>, with reasons captured. <b>That status + reason field is the quiet differentiator</b> — <i>what enables or prevents a decision</i> is data nobody collects today.</p>
+      <p style="color:var(--dim);font-size:14px">Explicitly <i>not</i> the MVP: turning this into the org's system of record for policy changes, consent/endorsement tracking, or anything beyond capturing the decision and its reason. That earns its way in once the record exists.</p>
+      <h3>Tool specs as first-class output</h3>
+      <p>When the gap is a missing capability, the output is a <b>drafted, lightweight tool spec</b> — name, trigger conditions, rough I/O shape, evidence traces, and the <b>cross-intent footprint</b>. It starts deliberately thin and gets sharper over time; the point isn't a finished design, it's a scoped, evidenced starting point for engineering. Modality gaps generalize hard: an agent that can't evaluate images or GPS fails dozens of intents that look unrelated symptom-by-symptom. Clustering by <i>missing capability</i> instead of symptom is what makes the spec a roadmap input, not a complaint.</p>
+    </section>
+
+    <!-- EXAMPLE -->
+    <section id="example">
+      <div class="eyebrow">walkthrough · DoorDash support agent</div>
+      <h2>Two issues, two different decisions — both wins.</h2>
+      <p><b>Setup:</b> Purpose = resolve Dasher support issues autonomously. North-star = <b>resolution rate without escalation</b>, computed from the outcome join (sessions ⟷ case-resolution table). Constraints = erroneous-payout rate (outcome join), cost per contact (trace-derived), undelivered-order rate (outcome join).</p>
+
+      <div class="issue">
+        <div class="top">
+          <span class="dot"></span>
+          <span class="ttl">Issue 1 · Dashers ask the agent to mark their own order delivered — and it can't</span>
+          <span class="pill amber">change: Policy</span>
+          <span class="pill ax">routes to: policy owner</span>
+        </div>
+        <div class="meta">
+          <div class="cell"><div class="cl">Trigger</div><div class="cv">An <b>escalation-necessity eval</b> — <i>would a reasonable agent have needed to hand this off?</i> — flags sessions where the agent reasoned correctly and was still blocked. Correctness evals pass these; the outcome data (order still not marked delivered) exposes them.</div></div>
+          <div class="cell"><div class="cl">Root cause · Alyx</div><div class="cv"><b>A quota limit, not a model error.</b> 1,240 sessions where a Dasher asked to mark their delivery complete; the agent reasoned correctly but hit a per-window <code>mark_delivered</code> cap → <code>quota_exceeded</code> → forced human handoff. 94% correct reasoning across the cluster.</div></div>
+        </div>
+        <div class="res">
+          <div class="rl">◆ the decision — routed to the people who already handle these</div>
+          <div class="rv">The platform does <b>not</b> recommend weakening the quota — it's a fraud control it can't adjudicate. It compiles the Decision Artifact and routes it to the policy owner with a concrete ask: <b>have humans review what human agents actually do</b> with these escalations today, to decide whether the quota can be <b>extended for these cases</b>, or whether there are <b>other checkable conditions</b> (verified Dasher, GPS-confirmed at address, prior clean history) that would let the agent mark the order delivered automatically.</div>
+          <div class="impact">
+            <span class="chip">ceiling <b>+3.1pt</b> resolution (5% vol × ~62% recoverable)</span>
+            <span class="chip guard">constraint · erroneous payouts <b>flagged</b> — the quota exists for a reason</span>
+            <span class="chip">evidence: 1,240 traces ›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="issue">
+        <div class="top">
+          <span class="dot" style="background:var(--ax); box-shadow:0 0 0 3px rgba(45,212,191,.15)"></span>
+          <span class="ttl">Issue 2 · The agent's instructions say "an image needs review" — so it escalates, every time</span>
+          <span class="pill ax">change: Tool · capability gap</span>
+          <span class="pill">14 intents · one missing modality</span>
+        </div>
+        <div class="meta">
+          <div class="cell"><div class="cl">What symptom-clustering sees</div><div class="cv">Three unrelated issues, because the photo means something different in each: <b>delivery disputes</b> (is this the right doorstep?), <b>damaged-item claims</b> (what's actually in the photo?), <b>address confirmation</b>.</div></div>
+          <div class="cell"><div class="cl">What capability-clustering sees</div><div class="cv"><b>One missing modality across 14 intents</b> — 3.2% of weekly volume sits behind a single gap: the agent can't <i>look at the picture</i>, so the escalation rule fires unconditionally.</div></div>
+        </div>
+        <div class="res">
+          <div class="rl">◆ the decision — a drafted spec for a general photo-evaluation tool</div>
+          <div class="rv">Not one narrow function — a <b>photo-evaluation tool the agent can call</b>, with the spec naming <i>what each case is actually looking for</i>: <b>match against past successful deliveries</b> (same doorstep / scene), <b>identify order size or specific item presence</b> (does the photo show the claimed items?), and an extensible slot for the next photo intent. Routed to engineering with the aggregate footprint — 14 intents, not one symptom.</div>
+          <div class="impact">
+            <span class="chip">ceiling <b>+2.2pt</b> across all 14 intents</span>
+            <span class="chip guard">mitigation: low confidence → current escalation path, unchanged</span>
+            <span class="chip">spec: PRD Appendix B ›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="box why"><div class="bt">▣ thirty days later</div>
+        <p>The photo tool shipped → re-measured → <b style="color:var(--green)">+1.7pt verified</b> (vs. +2.2 ceiling) → decision closed. The quota artifact: the policy owner extended the cap for verified Dashers with a clean history and <b style="color:var(--green)">+2.4pt verified</b>; the remainder stayed escalated by design — reason captured, one constraint added to the objective. <b>Both are wins:</b> one shipped a capability, one made a policy call the platform couldn't make alone and recorded why. That's a decision system, not a suggestion feed.</p>
+      </div>
+    </section>
+
+    <!-- MVP -->
+    <section id="mvp">
+      <div class="eyebrow">the mvp</div>
+      <h2>Principles first. Then the cut.</h2>
+      <div class="prins">
+        <div class="prin"><div class="pn">principle 1</div><div class="pt">Advances a named decision</div><p>Every feature moves a decision from open → made → shipped. Insight without a decision attached is out.</p></div>
+        <div class="prin"><div class="pn">principle 2</div><div class="pt">Downstream of the objective</div><p>If it works identically without outcomes + an objective, a competitor ships it without our wedge — out.</p></div>
+        <div class="prin"><div class="pn">principle 3</div><div class="pt">One agent, one join</div><p>Demoable on a single instrumented agent, at most one outcome join. No fleet scale, no accumulated history required.</p></div>
+        <div class="prin"><div class="pn">principle 4</div><div class="pt">Record before intelligence</div><p>V1's job is just to <b>capture the decision record</b> cheaply — status, reason, before/after. Get the substrate first; the smart features that learn from it come later.</p></div>
+      </div>
+      <h3>The MVP is one full turn of the loop — told straight</h3>
+      <p>Start where the developer already is: <b>Signal hands over clusters of eval failures.</b> The MVP layers the missing context on top of that input, in order:</p>
+      <p><b>First, ground and rank it.</b> Attach the agent's <b>objective and the joined outcome</b> to those clusters, so each one is no longer "a failing eval" but "a failing eval that's costing <i>this</i> business metric, this often." That's the step nothing else does.</p>
+      <p><b>Then classify the resolution.</b> Each ranked issue gets a <b>change type</b> — prompt, context, tool, permission, policy — and, where the fix lives outside the repo, a <b>"decision required"</b> artifact carrying the tradeoff (north-star upside <i>and</i> the constraint at risk), routed to the owner who can act on it.</p>
+      <p><b>Then track whether it actually happened.</b> The artifact's status records <b>if and when a fix shipped</b> — and on post-change traffic the loop re-measures <b>lift in both the eval <i>and</i> the business outcome</b>, closing the decision on verified movement or flagging the deviation. One agent, one join, one full turn — that's the demo.</p>
+      <p style="color:var(--dim);font-size:14px"><b>Out, by principle:</b> attribution timeline + velocity dashboards (need history — V2) · fleet capability rollup (needs &gt;1 agent — V2) · history-shaped recommendations (V3) · any auto-applied fix (trust is earned — V3+) · simulation/replay (V2) · dedicated policy-owner console (the shareable link is the MVP version).</p>
+    </section>
+
+    <!-- METRICS -->
+    <section id="metrics">
+      <div class="eyebrow">metrics</div>
+      <h2>The point is the business metric — not the eval score.</h2>
+      <p>The whole system would be a failure if it drove eval scores up while the business outcome stayed flat. So the metrics are built to reward <b>moved outcomes</b>, not green dashboards:</p>
+      <table>
+        <tr><th>Tier</th><th>Metric — and why it's the right one</th></tr>
+        <tr><td><b>North-star</b></td><td><b>Verified improvement rate</b> — % of agent projects that ship ≥1 decision through the loop within 30 days <i>and</i> see the declared <b>business north-star</b> move. Not "evals improved" — the outcome improved.</td></tr>
+        <tr><td><b>Leading</b></td><td>Time-to-first-decision · decisions reaching a terminal state (<i>declined-with-reason is a success; stalled is the failure</i>) · share of decisions that are higher-order (tool/permission/policy/context, not just prompt) — the differentiator.</td></tr>
+        <tr><td><b>Decision record</b></td><td>% of decisions that captured a <b>reason + before/after</b>. This is principle 4 made measurable: it's the data the V2/V3 intelligence will learn from, so V1's success is partly just <i>having recorded the decisions cleanly</i>.</td></tr>
+        <tr><td><b>Forecast honesty</b></td><td>The <b>projected-vs-verified gap</b> — how far our projected ceilings ran ahead of what actually shipped. We measure it on ourselves so the recommender is forced to get more honest over time, rather than overselling lift.</td></tr>
+      </table>
+      <h4>THE CONVERSION SEAM, SHARPENED</h4>
+      <pre class="seam"><span class="cm"># in OSS you can already set an objective and emit outcome events…</span>
+<span class="oss">Phoenix / OSS</span>  spans + objective + <b>outcome events</b> (OpenInference)  ──►  free
+      │
+      │   <span class="cm"># …but the outcome often lands long after the agent is done,</span>
+      │   <span class="cm"># and one event isn't an answer. you can see a problem forming —</span>
+      ▼
+<span class="axb">Arize AX</span>     joins outcomes at scale · ranks issues by objective · <b>routes the decision</b>
+      ▼            <span class="cm"># turning "a problem is forming" into a decision + verified lift is the AX unlock</span>
+         first trace → first outcome → objective → issue → <b>decision made → metric moved</b></pre>
+      <p>OSS gets you the raw materials — spans, an objective, even outcome events. But because the outcome arrives late and a single event isn't a recommendation, the moment those signals become a <b>ranked issue, a routed decision, and verified lift</b> is the moment you're in AX. The conversion trigger is no longer "persist an eval," or even "see an issue" — it's <b>"a decision the platform routed got made, and the metric moved."</b></p>
+    </section>
+
+    <!-- RISKS + ROADMAP -->
+    <section id="risks">
+      <div class="eyebrow">risks &amp; roadmap</div>
+      <h2>The hard parts — and how we meet them.</h2>
+      <table>
+        <tr><th>Challenge / risk</th><th>How we meet it</th></tr>
+        <tr><td>"This is Signal — we launched it last week."</td><td>Named up front; Signal is the issue <i>input</i> where available. This layer is what Signal doesn't claim: outcome ground truth, objective ranking, decisions outside the repo, verified close.</td></tr>
+        <tr><td><b>Getting teams to instrument outcomes</b> <span class="pill">challenge, not risk</span></td><td>The real work, so make it cheap and retrofittable: outcomes don't have to be planned up front — a team can <b>add the join later</b> to extend Signal's reach from "what broke" to "what it cost the business." And even with <i>no</i> outcomes yet — just a described objective — the platform can <b>explore impact conversationally</b> from the evals and traces it already has, then upgrade to hard numbers once an outcome is wired.</td></tr>
+        <tr><td>Projected lift is fake precision</td><td>True early — so it's always a labeled <i>ceiling</i> with visible arithmetic, never a point estimate; only verified lift closes a decision; and the projected-vs-verified gap is a tracked metric that forces the number to get better over time.</td></tr>
+        <tr><td>"Decision tracking is just Jira"</td><td>The opposite — Jira is the <b>integration</b>. Ideally we know exactly when a fix is pushed (via the Jira/Linear hook), and then the thing we can prove that Jira can't: <b>the failure mode disappears from the traces and the outcome moves.</b> A ticket can't compile its own evidence or close itself on metric movement.</td></tr>
+        <tr><td>"Constraint" is vague</td><td>Make it concrete: a constraint is a <b>counter-metric that must not regress</b> — e.g. for the DoorDash agent, <i>erroneous-payout rate</i> while we chase resolution rate. It's typed at setup as <i>trace-derived</i> or <i>outcome-joined</i>, and the objective can't name an outcome that isn't instrumented — so the setup form makes any blindness visible instead of papering over it.</td></tr>
+      </table>
+      <h3>Roadmap — the loop matures on a trust ladder</h3>
+      <p class="rsub">The axis is <b>trust, not time</b>: each rung hands the loop more to do on its own — and only after the last rung earned it.</p>
+      <div class="ladder">
+        <div class="rung v1">
+          <div class="rv">V1 · human-walked</div>
+          <div class="rname">The loop runs once, by hand.</div>
+          <div class="rt">The platform surfaces the issue, compiles the evidence, and routes it — but a human makes <b>every</b> call. The win isn't automation; it's that the <b>decision record starts</b>.</div>
+          <ul>
+            <li>surface · compile · route</li>
+            <li>every decision is human</li>
+            <li>the record begins</li>
+          </ul>
+        </div>
+        <div class="rung v2">
+          <div class="rv">V2 · the loop remembers</div>
+          <div class="rname">Now it has a past to reason over.</div>
+          <div class="rt">With a history of decisions and their outcomes, the loop gains <b>memory</b> — it can attribute lift, measure its own velocity, and roll up the fleet.</div>
+          <ul>
+            <li>attribution timeline</li>
+            <li>fix-to-lift + decision velocity</li>
+            <li>fleet capability rollup</li>
+            <li>recall of stalled decisions</li>
+            <li>simulation before commit</li>
+          </ul>
+        </div>
+        <div class="rung v3">
+          <div class="rv">V3 · the loop learns</div>
+          <div class="rname">It earns the right to act.</div>
+          <div class="rt">Recommendations shaped by what this org <b>actually ships</b>; trusted change types go semi-auto under a policy owner — autonomy that's <b>earned, never assumed</b>.</div>
+          <ul>
+            <li>org-shaped recommendations</li>
+            <li>semi-auto for trusted changes</li>
+            <li>policy-owner surface</li>
+            <li>earned autonomy</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box why" style="margin-top:18px"><div class="bt">▣ the build-to-proposal bridge</div>
+        <p>Building and instrumenting my own agent on AX this week, I had the trace and could see the retrieval failure — but turning that insight into a durable, <i>decided</i> fix was manual and lived in my head. And nothing in my telemetry could say whether the answer my agent gave actually <i>served</i> the user — the outcome lived outside the trace. Both gaps — signal to decision, interaction to outcome — are what this closes. <span style="color:var(--dim)">(I built DoorDash's multi-agent support platform on this exact stack — Arize + OpenTelemetry — so I've lived the policy-owner handoff and the outcome blindness as the customer.)</span></p>
+      </div>
+    </section>
+
+    <!-- APPENDIX -->
+    <section id="appendix">
+      <div class="eyebrow">appendix · spec depth</div>
+      <h2>The detail behind the argument.</h2>
+      <p>Folded in so the proposal stays one document — open what you want to inspect. The two specs below are the load-bearing ones: the open convention that makes outcomes portable, and a worked example of the tool spec the engine drafts.</p>
+
+      <details class="apx">
+        <summary>Appendix A · Outcome semantic convention <span class="sm">proposed OpenInference extension</span></summary>
+        <div class="apxbody">
+          <p>A standard way to attach <b>business outcomes</b> to agent sessions, neutral across frameworks — emitted by whichever system learns the truth, whenever it learns it. Attached to a session post-hoc by <code>session.id</code>:</p>
+          <table>
+            <tr><th>Attribute</th><th>Type</th><th>Example</th><th>Notes</th></tr>
+            <tr><td><code>outcome.name</code></td><td>string</td><td><code>order.delivered</code> · <code>case.resolved</code></td><td>dot-namespaced, org-defined</td></tr>
+            <tr><td><code>outcome.status</code></td><td>enum</td><td><code>achieved｜failed｜reversed｜unknown</code></td><td><code>reversed</code> covers false resolutions (reopened within window)</td></tr>
+            <tr><td><code>outcome.value</code></td><td>double</td><td><code>1.0</code> · <code>42.50</code></td><td>optional; unit via <code>outcome.unit</code></td></tr>
+            <tr><td><code>outcome.kind</code></td><td>enum</td><td><code>north_star｜constraint｜informational</code></td><td>how the objective layer consumes it</td></tr>
+            <tr><td><code>outcome.observed_at</code></td><td>timestamp</td><td>—</td><td>when truth was learned, distinct from ingest time</td></tr>
+            <tr><td><code>outcome.source</code></td><td>string</td><td><code>warehouse:delivery_facts</code></td><td>provenance</td></tr>
+            <tr><td><code>session.id</code></td><td>string</td><td>—</td><td>the join key; the one thing the agent must propagate</td></tr>
+          </table>
+          <p><b>Three emission paths, one schema:</b> (1) an SDK event from the business system; (2) a batch-ingest endpoint; (3) the warehouse join — a mapping config (<code>session_id_column</code>, <code>outcome_name</code>, <code>status_expr</code>, <code>observed_at_column</code>) that materializes the same attributes with no emission. All three land identically; evals, the objective layer, and decisions consume one schema.</p>
+          <p><b>Why a convention, not a feature:</b> the same reason OpenInference exists. If outcome semantics are vendor-proprietary, the loop is a walled garden; if they're an open extension, every framework can emit them and Arize is the place they become an improvement loop. The neutral party is the only one who can credibly propose it.</p>
+        </div>
+      </details>
+
+      <details class="apx">
+        <summary>Appendix B · Worked tool spec <span class="sm">drafted from Issue 2</span></summary>
+        <div class="apxbody">
+          <p>What engineering receives for a capability gap — a scoped, evidenced, prioritized starting point, not "the agent should handle images." Deliberately lightweight; the <code>open_questions_for_eng</code> block is the point: the platform drafts, the owner finishes.</p>
+          <pre>tool: evaluate_delivery_photo
+status: draft — generated from Issue #218, edited by [owner]
+purpose: >
+  Let the agent actually look at a submitted photo and answer what each
+  photo intent needs, so image-gated cases resolve without a blind escalation.
+trigger_conditions:
+  - session intent ∈ {delivery_dispute, damaged_item, wrong_address_claim, ...}  # 14 intents
+  - an image attachment is present on the session
+modes:                       <span class="cm"># what the tool is asked to look for, per intent</span>
+  match_prior_delivery:      <span class="cm"># delivery disputes — is this the right place?</span>
+    compares: submitted photo ↔ past successful-delivery photos for this address
+    returns: { match: enum[confirmed, mismatch, indeterminate], confidence }
+  inspect_contents:          <span class="cm"># damaged / wrong-item claims</span>
+    identifies: order size, presence of specific claimed items, visible damage
+    returns: { items_present: list, damage: bool, confidence }
+  <span class="cm"># extensible: a new photo intent adds a mode, not a new tool</span>
+inputs:
+  image:    { type: binary, source: customer_upload }
+  order_id: { type: string, source: session context }
+  mode:     { type: enum,   source: intent → mode mapping }
+evidence:
+  - 412 sessions escalated with image attachments the agent acknowledged
+    but could not evaluate (traces linked)
+  - cross-intent footprint: 14 intents, 3.2% of weekly volume
+projection:
+  ceiling: +2.2pt resolution rate (all 14 intents, full recovery — labeled ceiling)
+constraint_exposure:
+  erroneous_payout_rate: medium — gate auto-resolution on confidence ≥ 0.8
+  (below threshold → current escalation path, unchanged)
+open_questions_for_eng:
+  - reuse an existing CV service, or net-new model per mode?
+  - PII handling for customer-uploaded images (retention window?)</pre>
+        </div>
+      </details>
+
+      <details class="apx">
+        <summary>Appendix C · Open questions <span class="sm">what's deliberately unresolved</span></summary>
+        <div class="apxbody">
+          <ul>
+            <li><b>Outcome-event latency.</b> Outcomes arrive minutes-to-days after the session — what's the staleness window before an issue's ranking is recomputed?</li>
+            <li><b>Decline-reason capture.</b> Free text + optional tags in V1, or structured from day one? (Leaning free text + LLM-extraction — don't tax the policy owner.)</li>
+            <li><b>Where the Decision Artifact lives</b> for orgs that demand SSO on everything — link-with-token vs. a lightweight viewer seat.</li>
+            <li><b>Objective ownership</b> — project or org? (V1: project. Fleet rollup forces the org question in V2.)</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="foot">From Signal to Decisions · Part-3 proposal · mocks and the appendix of concepts considered in the sidebar.</div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const links = [...document.querySelectorAll('nav a')];
+  const map = Object.fromEntries(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { links.forEach(l => l.classList.remove('on')); map[e.target.id]?.classList.add('on'); } });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

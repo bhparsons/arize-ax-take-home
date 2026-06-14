@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Onboarding &amp; DX feedback log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e12; --bg2:#0d1419; --panel:#121b22; --panel2:#16212a;
+    --line:#22303a; --line2:#2c3e4a;
+    --ink:#e8eff2; --mut:#9fb4bf; --dim:#647a85;
+    --green:#46d39a; --greenDim:#1f6b50; --amber:#ffb454; --red:#ff6b6b;
+    --ax:#2dd4bf; --axGlow:rgba(45,212,191,.10);
+    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif; --disp:'Fraunces',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:15.5px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(34,48,58,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(34,48,58,.18) 1px,transparent 1px); background-size:34px 34px;}
+  main{max-width:860px; margin:0 auto; padding:clamp(28px,4vw,64px) clamp(22px,4vw,56px)}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ax); display:flex; align-items:center; gap:9px; margin-bottom:12px}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--ax)}
+  h1{font-family:var(--disp); font-weight:900; font-size:clamp(30px,4.6vw,46px); line-height:1.03; letter-spacing:-.02em}
+  .lead{font-size:17.5px; color:var(--ink); max-width:74ch; margin:14px 0 8px}
+  .legend{font-family:var(--mono); font-size:11.5px; color:var(--dim); margin:8px 0 0; display:flex; gap:14px; flex-wrap:wrap}
+  h2{font-family:var(--mono); font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--ax);
+     margin:34px 0 4px; padding-top:22px; border-top:1px solid var(--line)}
+  .themenote{color:var(--dim); font-style:italic; font-size:13.5px; margin:6px 0 4px; max-width:78ch}
+  ul{list-style:none; margin:8px 0}
+  li{margin:11px 0; padding-left:30px; position:relative; color:var(--mut); max-width:82ch}
+  li .mk{position:absolute; left:0; top:0}
+  li b{color:var(--ink); font-weight:600}
+  li i{color:var(--dim)}
+  code{font-family:var(--mono); font-size:.86em; background:#0c1318; border:1px solid var(--line); border-radius:5px; padding:1px 5px; color:#bfe9e0}
+  a{color:var(--ax); text-decoration:none; border-bottom:1px solid rgba(45,212,191,.3)}
+  a:hover{border-bottom-color:var(--ax)}
+  .homelink{display:inline-block; font-family:var(--mono); font-size:11px; color:var(--dim); text-decoration:none; border:0; margin-bottom:22px}
+  .homelink:hover{color:var(--ax)}
+  .foot{margin-top:34px; padding-top:18px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12px; color:var(--dim)}
+</style>
+</head>
+<body>
+  <main>
+    <a class="homelink" href="../index.html">← Back to Index</a>
+
+    <div class="eyebrow">Deliverable ② · onboarding feedback · raw log</div>
+    <h1>Onboarding &amp; DX feedback log</h1>
+    <p class="lead">Captured live during the build — friction <i>and</i> delight, timestamped. This is
+      the as-it-happened record; the triaged, presentation-ready version is
+      <a href="quick-fixes.html">quick-fixes.html</a>.</p>
+    <div class="legend"><span>⚠️🔴 friction</span><span>🟡 rough edge</span><span>✅🟢 delight</span><span>🧭 theme</span></div>
+
+    <h2>2026-06-09 — setup</h2>
+    <ul>
+      <li><span class="mk">⚠️</span><b>SDK drift is real.</b> <code>Agent(instrument=True)</code> (in many tutorials / our own REFERENCES.md) is deprecated in pydantic-ai 1.x — the supported switch is <code>Agent.instrument_all(True)</code>. Had to read installed source to find it. <i>Onboarding implication: Arize tracing snippets pinned to a framework version go stale silently; a "verify against your installed version" nudge (or a version-aware quickstart) would save a confusing first-trace miss.</i></li>
+      <li><span class="mk">✅</span><code>arize.otel.register(span_processors=[...])</code> cleanly accepts the OpenInference processor, so ordering vs the exporter is handled for you. Phoenix's <code>register()</code> lacks that arg → you must <code>.add_span_processor()</code> after, an easy ordering footgun. The asymmetry between the two <code>register()</code>s is a small DX paper-cut worth noting.</li>
+      <li><span class="mk">✅</span>One OpenRouter key for Claude/GPT/Gemini makes the "provider-neutral" story trivial to set up.</li>
+      <li><span class="mk">🟡</span>Python 3.14 (system) risked dependency wheels; pinning the venv to 3.12 via uv avoided it. A docs note on supported Python versions would preempt this.</li>
+    </ul>
+
+    <h2>2026-06-09 — Phase 3 (dataset + experiment + evals)</h2>
+    <ul>
+      <li><span class="mk">🔴</span><b>Biggest footgun: experiment tasks must be <code>async</code>.</b> A sync task using <code>agent.run_sync()</code> silently fails inside the experiment's running event loop (<code>asyncio.run() cannot be called from a running loop</code>) → every task output is <code>None</code> → ALL eval scores come back 0.0 with no obvious error in the summary. The fix (<code>async def task</code> + <code>await agent.run()</code>) isn't surfaced in the quickstart; the failure mode looks like "my evaluators are broken," not "my task threw." <i>A first-class diagnostic — "N tasks errored, see traces" in the run summary, or a sync-task autodetect — would save hours.</i></li>
+      <li><span class="mk">🟡</span>SDK API surface is non-obvious and partly BETA: <code>datasets.get(dataset=&lt;name&gt;)</code> (not <code>name=</code>), space passed per-call (not on the client), uploaded columns land under <code>additional_properties</code>. Introspecting installed source was faster than the docs.</li>
+      <li><span class="mk">🟡</span>Dataset name collisions throw a raw 409 ConflictException — a get-or-create helper or <code>create(..., exist_ok=True)</code> would be friendlier.</li>
+      <li><span class="mk">🟢</span>Once tasks were async, the dev workflow is genuinely tight: one <code>experiments.run</code> call gives per-row outputs + multi-judge scores, and dry_run is a real safety net.</li>
+      <li><span class="mk">🟢</span>Ingest ARIZE_API_KEY authorized BOTH tracing and the experiments SDK — no separate developer key needed (a pleasant surprise; AX docs imply otherwise).</li>
+    </ul>
+
+    <h2>2026-06-09 — Phase 4 (deliberate failure / observability)</h2>
+    <ul>
+      <li><span class="mk">🟢</span>Holding the judge model constant while swapping the agent model (one OpenRouter key) made the 3-provider comparison trivial — this is the single most persuasive Arize demo and it cost ~2 commands. Worth featuring in onboarding.</li>
+      <li><span class="mk">🟢</span>A degrade knob in the task (drop a corpus doc) + re-running the SAME experiment gives a clean before/after the eval columns capture automatically. The story writes itself: score drop → low-score traces → empty/weak RETRIEVER span → root cause → fix → recovery.</li>
+      <li><span class="mk">🟡</span>Online-eval <b>Tasks</b> are an AX-UI surface; wiring one from the SDK wasn't obvious (arize.tasks/arize.evaluators clients exist but undocumented for this). For the demo, the offline experiment delta tells the same story; an online Task on the live project is the remaining UI step to capture.</li>
+    </ul>
+
+    <h2>2026-06-11 — trace-review UX (observability workflow, in-product)</h2>
+    <p class="themenote">Friction found while actually reading traces in the AX UI — the core day-2 loop, distinct from setup. Theme: the trace detail view isn't a single pane of glass.</p>
+    <ul>
+      <li><span class="mk">🟡</span><b>Hidden horizontal scroll on the detail panes.</b> Switching between views in a span's detail (Input/Output vs. error/exception vs. other attributes), the content is <b>side-scrollable but gives no affordance that it is</b> — no fade edge, scrollbar, or "→ more" cue. It's easy to read a pane as complete and miss detail parked off-screen to the right. <i>Product implication: long values (prompts, tool args, retrieved docs) should wrap/expand by default, or carry an explicit overflow affordance. Silent horizontal overflow in a debugging tool actively hides the thing you opened the trace to see.</i></li>
+      <li><span class="mk">🔴</span><b>Tool-call-only spans read as "no output."</b> When a span's execution is purely a tool call, the main Output area shows nothing — the actual result is only visible under <b>Attributes</b>. The default view implies the step produced nothing, which is misleading and breaks the scan-down-the-waterfall flow. <i>Product implication: the span summary should surface the tool result (name + args + return) inline in the primary pane. For tool/retriever spans the OpenInference attributes ARE the output — the UI should promote them.</i></li>
+      <li><span class="mk">🧭</span><b>Root theme → single pane of glass.</b> Both issues are the same gap: following one trace end-to-end requires hunting across tabs, panes, and an off-screen axis. The ergonomic target is reading the full plan→tool→result→eval story top-to-bottom <b>without</b> clicking into Attributes or scrolling sideways. <i>A clean onboarding/observability-DX recommendation and a candidate talking point: the trace view should make the next thing you need to see the thing that's already on screen.</i></li>
+    </ul>
+
+    <h2>2026-06-12 — evaluator lifecycle / production eval quality</h2>
+    <p class="themenote">Found while reading the AX Evaluators + annotation docs — the day-2 question of how you keep an eval honest AFTER it's live. Both items below are candidate product concepts (seeded as H/I in the concept ledger).</p>
+    <ul>
+      <li><span class="mk">🟡</span><b>No live eval↔human divergence view.</b> Annotations and LLM-judge evals both land on the same span, but nothing surfaces <i>where they disagree</i> on production data — you detect judge drift by rebuilding an offline golden set and re-running agreement metrics, not in situ. <i>Product implication: a first-class "judge vs. human" divergence monitor on live spans would close the loop annotations open.</i></li>
+      <li><span class="mk">🟡</span><b>No inter-annotator agreement / labeler-noise signal.</b> Labeling queues allow multiple assignees but expose no κ/α or consensus metric — so when an eval won't converge you can't tell <i>labeler noise</i> from a <i>weak judge prompt</i>. <i>(Red-team precision check: AX <b>does</b> ship "Align Evals to Human Feedback" — a confusion matrix comparing one judge vs. human on a calibration set. What it does <b>not</b> ship is human-vs-human IAA: queues dedupe each item to a single reviewer. So Align Evals assumes clean human labels; it never measures whether the humans agree.)</i> <i>Product implication: add N-way overlap to labeling queues + a per-item agreement/κ panel that gates Align Evals, plus an "this evaluator is overloaded, split it into atomic criteria" diagnostic.</i></li>
+      <li><span class="mk">🧭</span><b>Theme → trust the humans and the rubric, not just the judge.</b> These extend the same eval-quality arc as concept G: G asks "is a generated eval good before you ship it?"; these ask "are your human labels consistent, is your live judge still agreeing with them, and is your rubric trying to do too much?" <i>(Disposition: folded into concept G — Langfuse shipped the live human-vs-judge monitor and IAA is commoditized in Label Studio/Argilla. See <a href="concept-ledger.html">concept-ledger.html</a> cards H/I.)</i></li>
+    </ul>
+
+    <h2>2026-06-13 — experiment vs. production eval review (verified with Alyx)</h2>
+    <p class="themenote">Found while reviewing failed experiment cases; confirmed live with Arize's in-product assistant (Alyx). Logged as Quick Fixes #8 and #9.</p>
+    <ul>
+      <li><span class="mk">🟡</span><b>Reviewing an experiment's evals is a different pattern than production's.</b> Production traces show evals on the <b>Evals tab of the trace view</b>. Experiment-run verdicts live on the experiment <b>run record</b> (the red/green labels in the compare table) and are <b>never written onto the trace spans</b> — so that tab is empty when you open a trace reached from an experiment. Debugging a failed row means bouncing between the compare table (the verdict) and the trace (the evidence). Confirmed deliberate with Alyx: <i>"Experiment eval scores are stored on the experiment run record, not written back onto the trace spans… most users use the compare table as the primary place to review."</i> That <i>intent</i> is the problem — it optimizes for the table author, not the trace debugger. <i>Product implication: surface experiment eval verdicts on the Evals tab of the trace review UI too — same single-pane-of-glass theme as the 6/11 items.</i></li>
+      <li><span class="mk">🟡</span><b>Alyx can't export its own transcript.</b> <i>"I don't have a tool to save this to a file… that's a limitation of the current chat interface"</i> — only copy/paste, screenshot, or print-to-PDF. This bit precisely because the exchange was worth keeping: users mine these conversations and carry them into other tools. <i>Product implication: one-click Export/Copy transcript (markdown or PDF) on the Alyx panel turns answers into reusable artifacts.</i> Quick Fix #9.</li>
+    </ul>
+
+    <div class="foot">Raw onboarding / DX log · Dev Research Assistant on Arize AX · Blake Parsons · triaged version → quick-fixes.html</div>
+  </main>
+</body>
+</html>

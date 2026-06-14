@@ -1,0 +1,23 @@
+# Agent framework (model-agnostic) + model SDK
+pydantic-ai
+anthropic
+
+# OpenInference instrumentation
+openinference-instrumentation-pydantic-ai
+# openinference-instrumentation-anthropic   # optional: extra LLM-level spans
+
+# Exporters / register()
+arize-otel            # Arize AX
+arize-phoenix-otel    # Phoenix fallback
+
+# Evals + experiments
+arize                 # AX datasets + experiments SDK (ArizeClient, experiments.run)
+arize-phoenix-evals
+arize-phoenix-client
+openai                # OpenRouter-compatible client used by the LLM judge
+
+# RAG corpus (naive local retrieval; swap for chromadb if desired)
+# chromadb
+numpy
+
+python-dotenv

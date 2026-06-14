@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Code internals — Dev Research Assistant on Arize AX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e12; --bg2:#0d1419; --panel:#121b22; --panel2:#16212a;
+    --line:#22303a; --line2:#2c3e4a;
+    --ink:#e8eff2; --mut:#9fb4bf; --dim:#647a85;
+    --green:#46d39a; --greenDim:#1f6b50; --amber:#ffb454; --red:#ff6b6b;
+    --ax:#2dd4bf; --axGlow:rgba(45,212,191,.10);
+    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif; --disp:'Fraunces',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(34,48,58,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(34,48,58,.18) 1px,transparent 1px); background-size:34px 34px;}
+  .wrap{display:grid; grid-template-columns:268px 1fr; max-width:1280px; margin:0 auto; min-height:100vh}
+  aside{position:sticky; top:0; height:100vh; overflow-y:auto; border-right:1px solid var(--line); padding:26px 20px 40px; background:rgba(10,14,18,.6)}
+  .brand{font-family:var(--disp); font-weight:900; font-size:21px; line-height:1.05; letter-spacing:-.01em; margin-bottom:4px}
+  .brand .ax{color:var(--ax)}
+  .brandsub{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:22px}
+  nav a{display:block; font-size:13.5px; color:var(--mut); text-decoration:none; padding:6px 10px; border-radius:6px; border-left:2px solid transparent; transition:.18s}
+  nav a:hover{color:var(--ink); background:var(--panel)}
+  nav a.on{color:var(--ax); border-left-color:var(--ax); background:var(--axGlow)}
+  nav .grp{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:18px 0 6px 10px}
+  main{padding:clamp(28px,4vw,64px) clamp(22px,4vw,72px); max-width:940px}
+  section{padding-top:30px; margin-bottom:30px; border-bottom:1px solid var(--line); padding-bottom:34px; scroll-margin-top:18px}
+  section:last-child{border-bottom:0}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ax); display:flex; align-items:center; gap:9px; margin-bottom:12px}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--ax)}
+  h1{font-family:var(--disp); font-weight:900; font-size:clamp(34px,5.4vw,58px); line-height:1; letter-spacing:-.02em}
+  h2{font-family:var(--disp); font-weight:600; font-size:clamp(25px,3.4vw,36px); line-height:1.06; letter-spacing:-.015em; margin-bottom:6px}
+  h3{font-family:var(--sans); font-weight:700; font-size:18px; margin:22px 0 8px; color:var(--ink)}
+  h4{font-family:var(--mono); font-weight:600; font-size:13px; letter-spacing:.04em; color:var(--ax); margin:18px 0 6px}
+  p{color:var(--mut); margin:10px 0; max-width:78ch}
+  p b,li b,td b{color:var(--ink); font-weight:600}
+  a{color:var(--ax); text-decoration:none; border-bottom:1px solid rgba(45,212,191,.3)}
+  a:hover{border-bottom-color:var(--ax)}
+  ul,ol{color:var(--mut); margin:10px 0 10px 22px; max-width:78ch}
+  li{margin:6px 0}
+  code{font-family:var(--mono); font-size:.88em; background:#0c1318; border:1px solid var(--line); border-radius:5px; padding:1px 6px; color:#bfe9e0}
+  pre{font-family:var(--mono); font-size:12.5px; line-height:1.7; background:#0b1116; border:1px solid var(--line2); border-radius:10px; padding:15px 17px; overflow-x:auto; margin:14px 0}
+  pre code{background:0;border:0;padding:0;color:#cfe7ee}
+  .kw{color:#ff9d6b}.fn{color:#6bb7ff}.str{color:#8fe388}.cm{color:var(--dim)}
+  .lead{font-size:18.5px; color:var(--ink); max-width:74ch}
+  .box{border:1px solid var(--line2); border-radius:10px; padding:15px 18px; margin:16px 0; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .box .bt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px; display:flex; gap:8px; align-items:center}
+  .box p{margin:4px 0}
+  .box.gotcha{border-color:rgba(255,180,84,.4); background:linear-gradient(180deg,rgba(255,180,84,.06),transparent)} .box.gotcha .bt{color:var(--amber)}
+  .box.tip{border-color:rgba(45,212,191,.4); background:linear-gradient(180deg,var(--axGlow),transparent)} .box.tip .bt{color:var(--ax)}
+  .box.why{border-color:var(--line2)} .box.why .bt{color:var(--mut)}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14px}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+  td{color:var(--mut)}
+  .ok{color:var(--green)} .no{color:var(--red)}
+  .pill{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:999px; border:1px solid var(--line2); color:var(--mut)}
+  .figure{margin:18px 0; border:1px solid var(--line2); border-radius:12px; overflow:hidden; background:var(--bg2)}
+  .figure img{width:100%; display:block; cursor:zoom-in}
+  .figcap{font-family:var(--mono); font-size:11.5px; color:var(--dim); padding:9px 14px; border-top:1px solid var(--line)}
+
+  /* LIGHTBOX */
+  .lb-overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+    background:rgba(4,7,9,.86); backdrop-filter:blur(3px); padding:32px; cursor:zoom-out}
+  .lb-overlay.open{display:flex}
+  .lb-overlay img{max-width:96vw; max-height:92vh; border:1px solid var(--line2); border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .lb-hint{position:fixed; top:18px; right:22px; font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--mut)}
+  .foot{margin-top:30px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+  @media(max-width:860px){ .wrap{grid-template-columns:1fr} aside{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)} }
+  .homelink{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); text-decoration:none; border:0; margin-bottom:18px}
+  .homelink:hover{color:var(--ax)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside>
+    <a class="homelink" href="../index.html">← Back to Index</a>
+    <div class="brand">Code <span class="ax">internals</span></div>
+    <div class="brandsub">how the agent actually runs</div>
+    <nav id="nav">
+      <div class="grp">Runtime</div>
+      <a href="#overview" class="on">1 · Two workflows</a>
+      <a href="#path">2 · End-to-end path</a>
+      <a href="#tracing">3 · The tracing link</a>
+      <a href="#boundary">4 · Local vs remote</a>
+      <a href="#spans">5 · Who emits spans</a>
+      <div class="grp">Python mechanics</div>
+      <a href="#closures">6 · Closures</a>
+      <a href="#decorators">7 · Decorators</a>
+      <a href="#invoke">8 · Direct vs agent-driven</a>
+      <div class="grp">Eval engine</div>
+      <a href="#experiment">9 · Dataset → experiment</a>
+      <a href="#judges">10 · The two eval lenses</a>
+      <div class="grp">Reference</div>
+      <a href="#cheat">11 · Mental-model cheat sheet</a>
+    </nav>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <main>
+
+    <!-- ---------- 0 / intro ---------- -->
+    <section id="overview">
+      <div class="eyebrow">Code internals · learning reference</div>
+      <h1>How the code actually runs.</h1>
+      <p class="lead">A mental-model reference for the Dev Research Assistant — the runtime path of a query, the Python mechanics underneath, and the offline eval engine. Companion to the interactive <a href="architecture.html">architecture diagram</a>.</p>
+
+      <h3>Two workflows, one codebase</h3>
+      <p>The repo serves two distinct flows. Keep them separate in your head — they share building blocks but answer different questions.</p>
+      <table>
+        <tr><th>Workflow</th><th>Entry</th><th>Question it answers</th></tr>
+        <tr><td><b>Observability</b></td><td><code>src/run.py</code></td><td>"Run one question — what does the <b>trace</b> look like?"</td></tr>
+        <tr><td><b>Development / eval</b></td><td><code>src/dataset.py</code> + <code>src/experiment.py</code></td><td>"Run many questions — how do they <b>score</b>, and how do models compare?"</td></tr>
+      </table>
+      <div class="box why"><div class="bt">▣ the through-line</div><p>The agent is the <b>vehicle</b>. The point is the trace / eval / debug narrative on top of it. Both workflows reuse the same <code>build_agent</code>, <code>Retriever</code>, and <code>setup_tracing</code> — they just drive them differently.</p></div>
+    </section>
+
+    <!-- ---------- 2 / path ---------- -->
+    <section id="path">
+      <div class="eyebrow">Runtime · execution</div>
+      <h2>The end-to-end path of one query.</h2>
+      <p>Everything inside the panel runs in <b>one Python process on your machine</b>. The model, the web, and the trace store are three separate remote services over HTTPS. The telemetry channel (green) is fire-and-forget — the agent never waits on Arize.</p>
+
+      <div class="figure">
+        <img src="screenshots/architecture-diagram.png" alt="Architecture diagram: one query flowing through the agent" />
+        <div class="figcap">RAG → web → answer, numbered ①–⑨. Open <a href="architecture.html">architecture.html</a> for the live version.</div>
+      </div>
+
+      <h3>The call chain</h3>
+      <ol>
+        <li><b>①</b> <code>run.py</code> parses args, calls <code>get_settings()</code> → <code>setup_tracing()</code> → <code>build_agent()</code> → <code>agent.run_sync(q)</code>.</li>
+        <li><b>②⑤⑧</b> Each model turn: Pydantic AI sends the prompt <b>plus the JSON schemas of the three tools</b> to OpenRouter → Anthropic. The model decides what to do.</li>
+        <li><b>③⑥⑨</b> The model returns a structured <b>tool call</b> (e.g. <code>doc_lookup(query=…)</code>) — or, when done, the final text.</li>
+        <li><b>④</b> The agent loop runs the tool locally → <code>rag.py</code> retrieval (no network).</li>
+        <li><b>⑦</b> A later turn calls <code>web_search</code> → Tavily.</li>
+      </ol>
+      <div class="box tip"><div class="bt">◆ the one-line mental model</div><p><b>run_sync</b> is just a sync wrapper around the async <code>run()</code> (<code>loop.run_until_complete</code>). The loop is multiple network round-trips: <b>decisions are remote, execution and loop-control are local.</b></p></div>
+    </section>
+
+    <!-- ---------- 3 / tracing link ---------- -->
+    <section id="tracing">
+      <div class="eyebrow">Runtime · instrumentation</div>
+      <h2>How <code>tracing.py</code> reaches the agent — with no import.</h2>
+      <p><code>agent.py</code> never imports <code>tracing.py</code>. The link is <b>shared global state</b>, deliberately decoupled, set up in two channels:</p>
+      <table>
+        <tr><th>Channel</th><th>Set by</th><th>Effect</th></tr>
+        <tr><td><b>OTel global provider</b></td><td><code>register()</code></td><td>Installs a process-wide tracer provider → <b>decides where spans go</b> (Arize).</td></tr>
+        <tr><td><b>Agent class flag</b></td><td><code>Agent.instrument_all(True)</code></td><td>Sets state on the <code>Agent</code> <b>class</b> → every instance <b>emits</b> spans.</td></tr>
+      </table>
+      <p>Both files do <code>from pydantic_ai import Agent</code> — the same class object in one process. The flag says "emit"; the provider says "send to Arize." You need both.</p>
+      <div class="box gotcha"><div class="bt">▲ ordering matters</div><p><code>run.py</code> calls <code>setup_tracing()</code> <b>before</b> <code>build_agent()</code>/<code>run_sync()</code>. Flip it and the agent runs fine but its spans go into a no-op provider — nothing reaches Arize.</p></div>
+      <div class="box why"><div class="bt">▣ why this design</div><p>This decoupling is what lets <code>tracing.py</code> be the only file that knows the backend. Switch <code>TRACING_BACKEND=ax|phoenix</code> in <code>.env</code> and no agent code changes — that <i>is</i> Arize's OTel/OpenInference neutrality, expressed in the build.</p></div>
+    </section>
+
+    <!-- ---------- 4 / boundary ---------- -->
+    <section id="boundary">
+      <div class="eyebrow">Runtime · visibility</div>
+      <h2>Local vs remote — and what you can see.</h2>
+      <p><b>All reasoning happens remotely</b>, on the model's servers. Your code owns the <b>menu</b> (which tools exist) and the <b>execution</b> (running them); the model owns the <b>judgment</b> (which tool, what args, when to stop).</p>
+      <h3>Two kinds of "steps" — different visibility</h3>
+      <table>
+        <tr><th>Kind</th><th>Visible?</th><th>Why</th></tr>
+        <tr><td><b>Across turns</b> (tool call → result → tool call)</td><td class="ok">Fully</td><td>Each turn is a round-trip your loop orchestrates — every one is a span.</td></tr>
+        <tr><td><b>Within a turn</b> (model's private reasoning before a tool call)</td><td class="no">No (by default)</td><td>It's computation inside one API call. You see the <i>decision it landed on</i>, not the deliberation — unless thinking tokens are explicitly enabled (this build doesn't).</td></tr>
+      </table>
+      <div class="box tip"><div class="bt">◆ litmus</div><p>If you <code>import</code> and call <code>web_search("…")</code> in a script, it returns a string but <b>nothing appears in Arize</b> — no loop opened a span around it. Tracing is a property of <i>the loop calling the tool</i>, not of the function.</p></div>
+      <p>The model has <b>no native tools to restrict</b> — in your process it can only <i>request</i> a call from the menu you defined; it can't execute anything itself.</p>
+    </section>
+
+    <!-- ---------- 5 / spans ---------- -->
+    <section id="spans">
+      <div class="eyebrow">Runtime · telemetry</div>
+      <h2>Who emits which span.</h2>
+      <p>Spans don't travel back through the agent as data. When any span <b>ends</b>, the OTel SDK hands it to the processor automatically via the global provider. The real question is <b>who creates each span</b> — and there are two answers.</p>
+      <table>
+        <tr><th>Span</th><th>Emitted by</th><th>Mechanism</th></tr>
+        <tr><td><b>LLM</b>, <b>TOOL</b></td><td>Pydantic AI's agent loop</td><td><b>Auto</b>-instrumentation wraps each model call / tool call. Your tool functions contain <i>zero</i> tracing code.</td></tr>
+        <tr><td><b>RETRIEVER</b></td><td><code>rag.py</code>, directly</td><td><b>Manual</b>: <code>retrieve()</code> opens its own span and writes <code>document.id/content/score</code> attributes.</td></tr>
+      </table>
+      <div class="box why"><div class="bt">▣ why rag.py is the exception</div><p>The loop can see the <i>tool call</i> (it wrapped it), but to the loop, <code>doc_lookup</code> is an opaque function returning a string. The "retrieval" concept — documents + scores — only exists if <b>you</b> instrument it. So that one span is hand-written. It nests <i>under</i> the TOOL span via OTel context.</p></div>
+    </section>
+
+    <!-- ---------- 6 / closures ---------- -->
+    <section id="closures">
+      <div class="eyebrow">Python mechanics</div>
+      <h2>Closures — why the tools need no <code>retriever</code> argument.</h2>
+      <p>A <b>closure</b> is a function plus the variables it references from the scope it was defined in, kept alive after that scope exits.</p>
+<pre><code><span class="kw">def</span> <span class="fn">build_agent</span>(label=<span class="kw">None</span>, dropped_docs=<span class="kw">None</span>):
+    retriever = <span class="fn">Retriever</span>(dropped_docs=dropped_docs)   <span class="cm"># local var</span>
+
+    <span class="fn">@agent.tool_plain</span>
+    <span class="kw">def</span> <span class="fn">doc_lookup</span>(query: <span class="kw">str</span>) -> <span class="kw">str</span>:
+        <span class="kw">return</span> <span class="fn">format_results</span>(retriever.<span class="fn">retrieve</span>(query))  <span class="cm"># captures retriever</span></code></pre>
+      <p><code>doc_lookup</code> takes only <code>query</code> (all the model supplies), yet still reaches <code>retriever</code> — via the closure. Two payoffs:</p>
+      <ul>
+        <li>No need to thread <code>retriever</code> through as an arg → it can be <code>tool_plain</code> (no run-context).</li>
+        <li>It's what makes <b>Phase-4 failure injection</b> work: each <code>build_agent(dropped_docs=…)</code> creates a fresh retriever, and a fresh <code>doc_lookup</code> closed over <i>that</i> degraded one.</li>
+      </ul>
+    </section>
+
+    <!-- ---------- 7 / decorators ---------- -->
+    <section id="decorators">
+      <div class="eyebrow">Python mechanics</div>
+      <h2>Decorators — what <code>@agent.tool_plain</code> really does.</h2>
+      <p>The <code>@</code> is pure syntax sugar. This:</p>
+<pre><code><span class="fn">@agent.tool_plain</span>
+<span class="kw">def</span> <span class="fn">doc_lookup</span>(query): ...</code></pre>
+      <p>is exactly:</p>
+<pre><code>doc_lookup = agent.<span class="fn">tool_plain</span>(doc_lookup)   <span class="cm"># call the agent's method on the function</span></code></pre>
+      <p><code>tool_plain</code> is a <b>register</b> decorator (not a wrap): it inspects the signature + docstring to build the tool's JSON schema, registers it on <i>this</i> agent, and returns the function unchanged.</p>
+      <div class="box tip"><div class="bt">◆ inheritance vs decoration — don't conflate</div><p><b>Inheritance</b> is why <code>agent</code> <i>has</i> a <code>tool_plain</code> method at all — it's defined on the <code>AbstractAgent</code> base and inherited by <code>Agent</code> (same place <code>run_sync</code> lives). <b>Decoration</b> is what that method then does to your function (<code>f = D(f)</code>). Two layers meeting on one line.</p></div>
+      <p><b>Why "<code>_plain</code>"</b>: it tells the framework the calling convention. <code>tool_plain</code> → call with only the model's args. <code>tool</code> → inject a <code>RunContext</code> first (for tools that need run state).</p>
+    </section>
+
+    <!-- ---------- 8 / invoke ---------- -->
+    <section id="invoke">
+      <div class="eyebrow">Python mechanics</div>
+      <h2>Direct vs agent-driven invocation.</h2>
+      <p>Same function, two callers. The difference isn't "decorated vs not" — the decorator's registration already happened at definition time. The difference is <b>who calls it</b>, which determines whether the orchestration runs.</p>
+      <table>
+        <tr><th>&nbsp;</th><th>Path A · you call it</th><th>Path B · agent loop calls it</th></tr>
+        <tr><td>Function body runs</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+        <tr><td>LLM call / OpenRouter</td><td class="no">✗</td><td class="ok">✓</td></tr>
+        <tr><td>Arg validation vs schema</td><td class="no">✗</td><td class="ok">✓</td></tr>
+        <tr><td>LLM + TOOL spans</td><td class="no">✗</td><td class="ok">✓</td></tr>
+        <tr><td>RETRIEVER span (manual)</td><td class="ok">✓ *if tracing on</td><td class="ok">✓</td></tr>
+        <tr><td>Retry / error-to-model</td><td class="no">✗</td><td class="ok">✓</td></tr>
+      </table>
+      <p>Because the tools are closures, "calling separately" means calling the logic they wrap:</p>
+<pre><code><span class="cm"># Path A — inspect retrieval with no LLM, no agent</span>
+<span class="kw">from</span> src.rag <span class="kw">import</span> Retriever, format_results
+hits = <span class="fn">Retriever</span>().<span class="fn">retrieve</span>(<span class="str">"how do I trace a pydantic ai agent?"</span>)
+<span class="fn">print</span>(<span class="fn">format_results</span>(hits))           <span class="cm"># same string doc_lookup returns</span>
+
+<span class="cm"># Path A — reproduce the Phase-4 failure offline</span>
+<span class="fn">Retriever</span>(dropped_docs={<span class="str">"arize-tracing.md"</span>}).<span class="fn">retrieve</span>(<span class="str">"send traces to arize"</span>)
+
+<span class="cm"># Path B — the real flow; model decides, loop orchestrates, traces land in AX</span>
+<span class="fn">setup_tracing</span>(<span class="fn">get_settings</span>())
+agent = <span class="fn">build_agent</span>()
+<span class="fn">print</span>(agent.<span class="fn">run_sync</span>(<span class="str">"How do I send traces to Arize?"</span>).output)</code></pre>
+    </section>
+
+    <!-- ---------- 9 / experiment ---------- -->
+    <section id="experiment">
+      <div class="eyebrow">Eval engine · development workflow</div>
+      <h2>Dataset → experiment → judge.</h2>
+      <p>The other half of <code>src/</code>. Where <code>run.py</code> is "one question, look at the trace," this is "many questions, <b>scored</b>, repeatable, comparable."</p>
+<pre><code>data/golden.jsonl ──▶ dataset.py ──▶ AX dataset <span class="str">"dev-research-golden"</span>
+                                          │
+                    client.experiments.<span class="fn">run</span>(task, evaluators=[…])
+                                          │
+      per row:  <span class="fn">task</span>(row) ─▶ agent.<span class="fn">run</span>(q) ─▶ {answer, context}
+                                          │
+      correctness_eval ─▶ judge ─▶ score 0..1, pass/fail
+      groundedness_eval ▶ judge ─▶ score 0..1, grounded/hallucinated</code></pre>
+
+      <h3>Stage 1 — the golden dataset</h3>
+      <p>12 hand-written rows: a <code>question</code> + the <code>expected_keypoints</code> a good answer must hit (checkable claims, not a full reference answer). <code>get_or_create_dataset()</code> is <b>idempotent</b> — uploaded once, then referenced by name.</p>
+
+      <h3>Stage 2 — the task</h3>
+<pre><code><span class="kw">async def</span> <span class="fn">task</span>(dataset_row) -> <span class="kw">dict</span>:
+    result = <span class="kw">await</span> agent.<span class="fn">run</span>(dataset_row[<span class="str">"question"</span>])
+    context = <span class="fn">format_results</span>(retriever.<span class="fn">retrieve</span>(dataset_row[<span class="str">"question"</span>]))
+    <span class="kw">return</span> {<span class="str">"answer"</span>: result.output, <span class="str">"context"</span>: context}</code></pre>
+      <ul>
+        <li><b>Async, not <code>run_sync</code></b> — the executor runs tasks inside a live event loop; <code>run_sync</code> would raise "can't call <code>asyncio.run()</code> from a running loop."</li>
+        <li><b>Returns <code>{answer, context}</code></b> — the two judges need different inputs.</li>
+      </ul>
+      <div class="box gotcha"><div class="bt">▲ a real subtlety</div><p>The task re-runs retrieval to capture <code>context</code>, even though the agent already retrieved internally. Pydantic AI doesn't surface the tool's return value cleanly, so context is reconstructed. It's an approximation — fine because retrieval is deterministic, but the judge sees <i>roughly</i> what the agent saw, not exactly.</p></div>
+
+      <h3>Two ingestion channels (again)</h3>
+      <p><code>setup_tracing()</code> runs here too, so the agent runs <i>during</i> the experiment are also traced. One experiment produces two streams into AX: <b>OTel traces</b> (ingest key) and <b>experiment scores</b> (developer/GraphQL key). Same two-key split as <code>config.py</code>.</p>
+    </section>
+
+    <!-- ---------- 10 / judges ---------- -->
+    <section id="judges">
+      <div class="eyebrow">Eval engine · LLM-as-judge</div>
+      <h2>The two eval lenses.</h2>
+      <p>The judge is a <b>separate LLM call</b> — raw <code>openai</code> SDK via OpenRouter, <code>temperature=0</code>, asked to reply with strict JSON <code>{score, explanation}</code> (with defensive parsing, because models don't always comply). The agent <i>answers</i>; the judge <i>grades</i>.</p>
+      <table>
+        <tr><th>Eval</th><th>Compares</th><th>Catches</th></tr>
+        <tr><td><b>correctness</b></td><td>answer ↔ expected key points</td><td>Did it say the right things? (completeness)</td></tr>
+        <tr><td><b>groundedness</b></td><td>answer ↔ retrieved context</td><td>Is every claim supported by the docs it had? (hallucination)</td></tr>
+      </table>
+      <div class="box why"><div class="bt">▣ why two, not one</div><p>They measure orthogonal failures. An answer can be <b>correct but ungrounded</b> (right facts from memory, not the docs) or <b>grounded but incorrect</b> (faithful to weak context, misses the point). Both prompts reward <i>admitting ignorance</i> over fabricating — the exact behavior the agent's system prompt demands.</p></div>
+      <h3>The payoff — model-swap</h3>
+      <p>Run the same dataset + judges with a different agent model:</p>
+<pre><code>python -m src.experiment --model claude --full   <span class="cm"># run "claude-full"</span>
+python -m src.experiment --model gpt --full      <span class="cm"># run "gpt-full"</span></code></pre>
+      <p>AX shows the two runs side by side with correctness/groundedness columns — a head-to-head on identical questions and judges. That's provider-neutrality made concrete. Append <code>--dropped-docs arize-tracing.md</code> and the run name gets <code>-degraded</code>: same experiment, starved corpus, and you watch <b>groundedness</b> drop against a clean baseline.</p>
+    </section>
+
+    <!-- ---------- 11 / cheat sheet ---------- -->
+    <section id="cheat">
+      <div class="eyebrow">Reference</div>
+      <h2>Mental-model cheat sheet.</h2>
+      <ul>
+        <li><b>The agent is the vehicle</b>; the trace / eval / debug narrative is the point.</li>
+        <li><b>Decisions are remote, execution + loop-control are local.</b> The model owns judgment; you own the menu and the hands.</li>
+        <li><b><code>run_sync</code> = sync wrapper</b> over the async <code>run()</code>. One engine, two front doors.</li>
+        <li><b>Tracing links via two globals</b>, not an import: the OTel provider (where) + the <code>Agent</code> class flag (emit). Set up before building the agent.</li>
+        <li><b>Spans: auto for LLM/TOOL</b> (the loop), <b>manual for RETRIEVER</b> (rag.py). They reach the exporter via the global provider, not through the agent.</li>
+        <li><b>Closures</b> let tools skip a <code>retriever</code> arg and power the failure-injection knob.</li>
+        <li><b><code>@tool_plain</code> = register + describe.</b> Inheritance gives the method; decoration registers the function; the <i>loop</i> adds validate/trace/retry when <i>it</i> calls the tool.</li>
+        <li><b>Same function, the difference is the caller.</b> Direct = raw logic. Agent-driven = logic + orchestration.</li>
+        <li><b>Eval engine</b>: golden dataset → async task → two LLM-judge lenses (correctness, groundedness) → compare runs. Model-swap and degraded-corpus are just different run names over the same harness.</li>
+        <li><b>Two keys, two doors</b>: ingest key for traces, developer key for datasets/experiments.</li>
+      </ul>
+      <div class="foot">code-internals · companion to architecture.html · accent = --ax</div>
+    </section>
+
+  </main>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lb"><span class="lb-hint">click / esc to close</span><img id="lb-img" alt="" /></div>
+
+<script>
+  // Lightbox: click any figure image to view full-size
+  (function(){
+    var lb = document.getElementById('lb'), lbImg = document.getElementById('lb-img');
+    document.querySelectorAll('.figure img').forEach(function(img){
+      img.addEventListener('click', function(){
+        lbImg.src = img.currentSrc || img.src;
+        lbImg.alt = img.alt;
+        lb.classList.add('open');
+      });
+    });
+    lb.addEventListener('click', function(){ lb.classList.remove('open'); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') lb.classList.remove('open'); });
+  })();
+
+  const links = [...document.querySelectorAll('nav a')];
+  const map = Object.fromEntries(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('on'));
+        map[e.target.id]?.classList.add('on');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

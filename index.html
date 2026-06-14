@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<!-- ============================================================================
+     index.html — single unifying map of the submission (the "start here" page).
+     Shares the observability-console design system with the artifacts/ HTML pages.
+     The root README.md is the Markdown mirror of this page (for the GitHub path).
+============================================================================= -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Start here · Dev Research Assistant on Arize AX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e12; --bg2:#0d1419; --panel:#121b22; --panel2:#16212a;
+    --line:#22303a; --line2:#2c3e4a;
+    --ink:#e8eff2; --mut:#9fb4bf; --dim:#647a85;
+    --green:#46d39a; --greenDim:#1f6b50; --amber:#ffb454; --red:#ff6b6b;
+    --ax:#2dd4bf; --axGlow:rgba(45,212,191,.10);
+    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif; --disp:'Fraunces',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(34,48,58,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(34,48,58,.18) 1px,transparent 1px); background-size:34px 34px;}
+  .wrap{display:grid; grid-template-columns:268px 1fr; max-width:1280px; margin:0 auto; min-height:100vh}
+
+  aside{position:sticky; top:0; height:100vh; overflow-y:auto; border-right:1px solid var(--line); padding:26px 20px 40px; background:rgba(10,14,18,.6)}
+  .brand{font-family:var(--disp); font-weight:900; font-size:21px; line-height:1.05; letter-spacing:-.01em; margin-bottom:4px}
+  .brand .ax{color:var(--ax)}
+  .brandsub{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:22px}
+  nav a{display:block; font-size:13.5px; color:var(--mut); text-decoration:none; padding:6px 10px; border-radius:6px; border-left:2px solid transparent; transition:.18s}
+  nav a:hover{color:var(--ink); background:var(--panel)}
+  nav a.on{color:var(--ax); border-left-color:var(--ax); background:var(--axGlow)}
+  nav .grp{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:18px 0 6px 10px}
+
+  main{padding:clamp(28px,4vw,64px) clamp(22px,4vw,72px); max-width:960px}
+  section{padding-top:30px; margin-bottom:30px; border-bottom:1px solid var(--line); padding-bottom:34px; scroll-margin-top:18px}
+  section:last-child{border-bottom:0}
+
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ax); display:flex; align-items:center; gap:9px; margin-bottom:12px}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--ax)}
+  h1{font-family:var(--disp); font-weight:900; font-size:clamp(34px,5.4vw,58px); line-height:1; letter-spacing:-.02em}
+  h2{font-family:var(--disp); font-weight:600; font-size:clamp(25px,3.4vw,36px); line-height:1.06; letter-spacing:-.015em; margin-bottom:6px}
+  h3{font-family:var(--sans); font-weight:700; font-size:19px; margin:24px 0 8px; color:var(--ink)}
+  h4{font-family:var(--mono); font-weight:600; font-size:13px; letter-spacing:.04em; color:var(--ax); margin:18px 0 6px}
+  p{color:var(--mut); margin:10px 0; max-width:74ch}
+  p b,li b,td b{color:var(--ink); font-weight:600}
+  a{color:var(--ax); text-decoration:none; border-bottom:1px solid rgba(45,212,191,.3)}
+  a:hover{border-bottom-color:var(--ax)}
+  ul,ol{color:var(--mut); margin:10px 0 10px 22px; max-width:74ch}
+  li{margin:6px 0}
+  .lead{font-size:19px; color:var(--ink); max-width:72ch}
+
+  code{font-family:var(--mono); font-size:.88em; background:#0c1318; border:1px solid var(--line); border-radius:5px; padding:1px 6px; color:#bfe9e0}
+  code a{border:0}
+  pre{font-family:var(--mono); font-size:13px; line-height:1.7; background:#0b1116; border:1px solid var(--line2); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:14px 0}
+  pre code{background:0;border:0;padding:0;color:#cfe7ee}
+  .kw{color:#ff9d6b}.fn{color:#6bb7ff}.str{color:#8fe388}.cm{color:var(--dim)}
+
+  .box{border:1px solid var(--line2); border-radius:10px; padding:15px 18px; margin:16px 0; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .box .bt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:7px; display:flex; gap:8px; align-items:center}
+  .box p{margin:4px 0}
+  .box.gotcha{border-color:rgba(255,180,84,.4); background:linear-gradient(180deg,rgba(255,180,84,.06),transparent)} .box.gotcha .bt{color:var(--amber)}
+  .box.tip{border-color:rgba(45,212,191,.4); background:linear-gradient(180deg,var(--axGlow),transparent)} .box.tip .bt{color:var(--ax)}
+  .box.why{border-color:var(--line2)} .box.why .bt{color:var(--mut)}
+
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14px}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+  td{color:var(--mut)}
+  td code{font-size:.95em}
+
+  .pill{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:999px; border:1px solid var(--line2); color:var(--mut); white-space:nowrap}
+  .pill.done{color:var(--green); border-color:var(--greenDim)} .pill.todo{color:var(--amber); border-color:rgba(255,180,84,.4)}
+
+  .deliv{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:18px 0}
+  .card{border:1px solid var(--line2); border-radius:12px; padding:16px 18px; background:linear-gradient(180deg,var(--panel),var(--bg2))}
+  .card .k{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ax); margin-bottom:6px}
+  .card h3{margin:0 0 6px; font-size:17px}
+  .card p{font-size:13.5px; margin:4px 0}
+
+  .step{display:flex; gap:14px; margin:12px 0; align-items:flex-start}
+  .step .n{font-family:var(--mono); flex:none; width:30px; height:30px; border-radius:8px; border:1px solid var(--ax); color:var(--ax); display:grid; place-items:center; font-size:13px}
+  .step .b{flex:1}
+  .step .b b{color:var(--ink)}
+
+  .foot{margin-top:30px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+
+  @media(max-width:860px){ .wrap{grid-template-columns:1fr} aside{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside>
+    <div class="brand">Dev Research<br><span class="ax">Assistant</span></div>
+    <div class="brandsub">Arize AX · start here</div>
+    <nav id="nav">
+      <div class="grp">Start</div>
+      <a href="#overview" class="on">Overview</a>
+      <div class="grp">The 3 deliverables</div>
+      <a href="#build">① The build</a>
+      <a href="#workflows">② Workflows + evidence</a>
+      <a href="#proposal">③ Proposal</a>
+      <div class="grp">Using this repo</div>
+      <a href="#run">How to run it</a>
+      <a href="#map">Where everything lives</a>
+      <a href="#read">Suggested path</a>
+    </nav>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <main>
+
+    <!-- ---------- OVERVIEW ---------- -->
+    <section id="overview">
+      <div class="eyebrow">Arize AI · AI Product Manager take-home</div>
+      <h1>Dev Research Assistant,<br>instrumented on Arize&nbsp;AX</h1>
+      <p class="lead">A multi-tool research agent (<b>Pydantic AI on Claude</b>) traced end-to-end on
+        <b>Arize AX</b> — tracing, offline experiments, online evals, and a deliberately-debugged
+        retrieval failure. This page is the map: it tells you what's here and where to look.</p>
+
+      <p>Built by <b>Blake Parsons</b>. The assignment has three parts — a <b>build</b>, evidence of
+        both Arize <b>workflows</b> (development + observability), and a visual <b>proposal</b>. Each
+        has a home below.</p>
+
+      <div class="deliv">
+        <div class="card"><div class="k">① Build</div><h3>The agent</h3>
+          <p>Pydantic-AI agent + RAG, traced live on AX.</p>
+          <p><code>src/</code> · <a href="artifacts/architecture.html">architecture →</a></p></div>
+        <div class="card"><div class="k">② Workflows</div><h3>Evidence</h3>
+          <p>Dataset→experiment→evals, plus a debugged failure.</p>
+          <p><a href="artifacts/RESULTS.html">RESULTS.html →</a></p></div>
+        <div class="card"><div class="k">③ Proposal</div><h3>The MVP pitch</h3>
+          <p><i>From Signal to Decisions</i> — grounding the improvement loop in outcomes.</p>
+          <p><a href="artifacts/proposal-v3.html">proposal-v3.html →</a></p></div>
+      </div>
+
+      <div class="box tip"><div class="bt">◆ if you read one thing</div>
+        <p>Open <a href="artifacts/proposal-v3.html">artifacts/proposal-v3.html</a> (the proposal) and
+          <a href="artifacts/RESULTS.html">artifacts/RESULTS.html</a> (the workflow evidence). Everything
+          else here supports those two.</p></div>
+    </section>
+
+    <!-- ---------- BUILD ---------- -->
+    <section id="build">
+      <div class="eyebrow">Deliverable ① · the build</div>
+      <h2>An agent that helps devs build agents</h2>
+      <p>A <b>Developer Research Assistant</b>: it plans a lookup, retrieves over a local doc corpus,
+        optionally web-searches, reasons over the sources, and writes a cited answer. Built on
+        <b>Pydantic AI</b> (model-agnostic) running on <b>Claude</b> via OpenRouter, and instrumented
+        to Arize AX through OpenInference / OTel.</p>
+
+<pre><code>AGENT (researcher)
+ ├─ <span class="fn">LLM</span>   plan the lookup
+ ├─ <span class="fn">TOOL</span>  doc_lookup  →  <span class="kw">RETRIEVER</span> (local RAG corpus)   <span class="cm">← the deliberate failure surface</span>
+ ├─ <span class="fn">TOOL</span>  web_search
+ ├─ <span class="fn">LLM</span>   reason over sources
+ └─ <span class="fn">LLM</span>   writer  →  cited answer</code></pre>
+
+      <p><b>Why Pydantic AI on Claude:</b> it's model-agnostic, which (a) showcases Arize's
+        OTel/OpenInference neutrality, (b) makes the required model-swap experiment sing
+        (Claude ↔ GPT ↔ Gemini on the same agent), and (c) stays on-brand with Claude.</p>
+
+      <h4>Where the code lives</h4>
+      <table>
+        <tr><th>File</th><th>Responsibility</th></tr>
+        <tr><td><code>src/run.py</code></td><td>CLI entry — settings → tracing → build agent → run.</td></tr>
+        <tr><td><code>src/agent.py</code></td><td>Builds the Pydantic-AI agent + the three tools.</td></tr>
+        <tr><td><code>src/rag.py</code></td><td>TF-IDF retriever over <code>corpus/</code>; emits the RETRIEVER span.</td></tr>
+        <tr><td><code>src/tracing.py</code></td><td>The only file that knows the backend (AX vs Phoenix).</td></tr>
+        <tr><td><code>src/config.py</code></td><td>Keys, model map, OpenRouter endpoint.</td></tr>
+        <tr><td><code>src/dataset.py</code> · <code>src/experiment.py</code></td><td>Golden dataset + LLM-judge experiment engine.</td></tr>
+      </table>
+
+      <div class="box why"><div class="bt">▣ want the deep tour?</div>
+        <p>Two companion explainers walk the build in detail:
+          <a href="artifacts/architecture.html">architecture.html</a> (one query traced ①→⑨) and
+          <a href="artifacts/code-internals.html">code-internals.html</a> (the code mental-model:
+          the tracing link, span emission, decorators, the eval engine).</p></div>
+    </section>
+
+    <!-- ---------- WORKFLOWS ---------- -->
+    <section id="workflows">
+      <div class="eyebrow">Deliverable ② · workflows + onboarding feedback</div>
+      <h2>Both Arize workflows, evidenced</h2>
+      <p>The assignment asks for the <b>development</b> workflow (dataset → experiment → eval) and the
+        <b>observability</b> workflow (tracing + evals + a debugged issue). Both were run:</p>
+
+      <div class="step"><div class="n">A</div><div class="b"><b>Development:</b> a 12-row golden
+        dataset → an experiment with two LLM-judges (correctness + groundedness) → a three-model
+        comparison (Claude / GPT / Gemini). Reproduce with the commands in
+        <a href="artifacts/RESULTS.html">RESULTS.html</a>.</div></div>
+      <div class="step"><div class="n">B</div><div class="b"><b>Observability:</b> traces land in AX;
+        a <b>deliberate retriever failure</b> (drop corpus docs) makes the groundedness judge score
+        those traces low; root-cause in the waterfall (empty RETRIEVER span → fabricated answer);
+        fix → score recovers. The before/after delta is the story.</div></div>
+
+      <h4>Where the evidence lives</h4>
+      <table>
+        <tr><th>File</th><th>What it shows</th></tr>
+        <tr><td><code><a href="artifacts/RESULTS.html">artifacts/RESULTS.html</a></code></td><td>Model comparison + the failure delta, with the AX waterfall + experiment-comparison captures embedded, and repro commands.</td></tr>
+        <tr><td><code><a href="artifacts/quick-fixes.html">artifacts/quick-fixes.html</a></code></td><td>The onboarding DX writeup — nine papercuts + a "what went well" box, with evidence screenshots.</td></tr>
+        <tr><td><code><a href="artifacts/FEEDBACK.html">artifacts/FEEDBACK.html</a></code></td><td>The raw, as-it-happened onboarding-friction log.</td></tr>
+      </table>
+    </section>
+
+    <!-- ---------- PROPOSAL ---------- -->
+    <section id="proposal">
+      <div class="eyebrow">Deliverable ③ · the proposal</div>
+      <h2>From Signal to Decisions</h2>
+      <p>The Part-3 question: <i>what should Arize build to grow AX adoption among developers building
+        agents?</i> The answer — <b>From Signal to Decisions</b>: ground the improvement loop in
+        outcomes — objective → ranked issues → decisions routed to owners → verified lift. Presented
+        verbally in a later round.</p>
+      <table>
+        <tr><th>File</th><th>Use</th></tr>
+        <tr><td><code><a href="artifacts/proposal-v3.html">artifacts/proposal-v3.html</a></code></td><td><b>The proposal</b> — the visual digest. Start here.</td></tr>
+        <tr><td><code><a href="artifacts/mocks-v3.html">artifacts/mocks-v3.html</a></code></td><td>UI mocks of one full turn of the loop (objective setup → decision queue → decision detail → tool spec).</td></tr>
+        <tr><td><code><a href="artifacts/concept-ledger.html">artifacts/concept-ledger.html</a></code></td><td>Appendix — every concept considered + how it was triaged.</td></tr>
+        <tr><td><code><a href="artifacts/quick-fixes.html">artifacts/quick-fixes.html</a></code></td><td>Onboarding/DX papercuts + "what went well", rendered with evidence screenshots.</td></tr>
+      </table>
+    </section>
+
+    <!-- ---------- RUN ---------- -->
+    <section id="run">
+      <div class="eyebrow">Using this repo · run it</div>
+      <h2>Run the agent in ~2 minutes</h2>
+<pre><code><span class="cm"># 3.12 for wheel compatibility</span>
+uv venv --python 3.12 <span class="kw">&&</span> source .venv/bin/activate
+uv pip install -r requirements.txt
+cp .env.example .env        <span class="cm"># fill OPENROUTER_API_KEY + ARIZE_SPACE_ID/ARIZE_API_KEY</span>
+
+python -m src.run                                  <span class="cm"># default demo question</span>
+python -m src.run <span class="str">"How do I run an experiment with an LLM judge?"</span>
+python -m src.run --model gpt <span class="str">"..."</span>            <span class="cm"># swap provider (model-agnostic demo)</span></code></pre>
+      <p>Model auth is a single <b>OpenRouter</b> key (reaches Claude/GPT/Gemini through one
+        OpenAI-compatible endpoint). The tracing backend is chosen by <code>TRACING_BACKEND=ax|phoenix</code>
+        — only <code>src/tracing.py</code> knows the difference.</p>
+      <div class="box gotcha"><div class="bt">▲ secrets</div>
+        <p>The repo is git-clean — <code>.env</code> and <code>.venv</code> are gitignored; the
+          evidence screenshots ship. Copy <code>.env.example</code> to <code>.env</code> and add your
+          own keys to run.</p></div>
+    </section>
+
+    <!-- ---------- MAP ---------- -->
+    <section id="map">
+      <div class="eyebrow">Using this repo · the full map</div>
+      <h2>Where everything lives</h2>
+
+      <h4>Source &amp; data</h4>
+      <table>
+        <tr><th>Path</th><th>What</th></tr>
+        <tr><td><code>src/</code></td><td>The agent, RAG tool, tracing setup, dataset + experiment scripts.</td></tr>
+        <tr><td><code>corpus/</code></td><td>5 local Markdown docs the agent retrieves over.</td></tr>
+        <tr><td><code>data/golden.jsonl</code></td><td>The 12-row golden eval set (question + expected keypoints).</td></tr>
+        <tr><td><code>requirements.txt</code> · <code>.env.example</code></td><td>Deps and the env-var template.</td></tr>
+      </table>
+
+      <h4>Deliverables &amp; evidence — <code>artifacts/</code></h4>
+      <table>
+        <tr><th>File</th><th>What</th></tr>
+        <tr><td><code>proposal-v3.html</code> · <code>mocks-v3.html</code></td><td>Part-3 visual proposal (<i>From Signal to Decisions</i>) + UI mocks.</td></tr>
+        <tr><td><code>concept-ledger.html</code></td><td>Proposal appendix — every concept considered + triage.</td></tr>
+        <tr><td><code>quick-fixes.html</code></td><td>Onboarding DX feedback — papercuts + "what went well", with screenshots.</td></tr>
+        <tr><td><code>RESULTS.html</code> · <code>FEEDBACK.html</code></td><td>Workflow evidence (waterfall + comparison embedded) + the raw DX log.</td></tr>
+        <tr><td><code><a href="artifacts/architecture.html">architecture.html</a></code> · <code><a href="artifacts/code-internals.html">code-internals.html</a></code></td><td>Explainer companions (how the build works).</td></tr>
+      </table>
+    </section>
+
+    <!-- ---------- READ ---------- -->
+    <section id="read">
+      <div class="eyebrow">Suggested path</div>
+      <h2>A 10-minute read</h2>
+      <div class="box tip"><div class="bt">◆ in order</div>
+        <p>1. This page → 2. <a href="artifacts/proposal-v3.html">proposal-v3.html</a> (the pitch) → 3.
+          <a href="artifacts/RESULTS.html">RESULTS.html</a> (the evidence) → 4. skim
+          <code>src/agent.py</code> + <code>src/tracing.py</code> → 5.
+          <a href="artifacts/architecture.html">architecture.html</a> for the traced execution path.</p></div>
+
+      <div class="foot">Dev Research Assistant on Arize AX · Blake Parsons</div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const links = [...document.querySelectorAll('nav a[href^="#"]')];
+  const map = Object.fromEntries(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('on'));
+        map[e.target.id]?.classList.add('on');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
