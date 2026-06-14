@@ -1,11 +1,14 @@
 # Dev Research Assistant — Arize AX take-home
 
+### ▶ View it live (fully rendered): **https://bhparsons.github.io/arize-ax-take-home/**
+
 A multi-tool research agent (**Pydantic AI on Claude**) instrumented end-to-end on **Arize AX**:
 tracing, offline experiments, online evals, and a deliberately-debugged retrieval failure. Built by
 Blake Parsons for the Arize AI **AI Product Manager** take-home.
 
-> **Start here.** This README is the map. If you received this as a **zip**, open
-> [`index.html`](index.html) in a browser for the same map with clickable navigation.
+> **Start here.** Open the [live site](https://bhparsons.github.io/arize-ax-take-home/) to click
+> through everything rendered. (On GitHub directly, `.html` files show as source — the live link is
+> the easy path. If you have this as a zip, open [`index.html`](index.html) in a browser instead.)
 
 The assignment has three parts — a **build**, evidence of both Arize **workflows**, and a visual
 **proposal**. Each has a home below.
