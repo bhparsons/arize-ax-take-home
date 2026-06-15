@@ -317,10 +317,16 @@ ax tasks trigger-run --task &lt;id&gt;        <span class="cm"># run it over exi
     <div class="fix">
       <div class="fhead"><span class="fnum">8</span><span class="fttl">Experiment eval scores never make it onto the trace</span><span class="pill ax">build</span></div>
       <div class="frow"><div class="flab">Pain</div><p>When I review an <b>experiment</b>, the eval verdicts show up on the experiment results view (the red/green labels in the compare table). But those verdicts are <b>never written onto the trace</b> — so when I open a trace from that experiment, its <b>Evals tab is empty</b>. If we want people debugging in the trace, the evals have to be on that screen too.</p></div>
-      <figure class="shot">
-        <img src="screenshots/qf8-experiment-evals.png" alt="Experiment compare view showing eval verdicts that don't appear on the trace" onerror="this.closest('.shot').classList.add('missing')" />
-        <figcaption>Verdicts live on the experiment results view — but open the underlying trace and its Evals tab is empty.</figcaption>
-      </figure>
+      <div class="shotpair">
+        <figure class="shot">
+          <img src="screenshots/experiment-table-eval-tags.png" alt="Experiment compare table with correctness_eval and groundedness_eval verdict tags on every row" onerror="this.closest('.shot').classList.add('missing')" />
+          <figcaption><b>Where they show up:</b> the experiment compare table — every row carries its <code>correctness_eval</code> / <code>groundedness_eval</code> verdict, with a trace link right beside the output.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="screenshots/experiment-trace-no-evals.png" alt="Trace opened from that experiment row with the Evaluations tab reading 0 and an empty Add Evaluator state" onerror="this.closest('.shot').classList.add('missing')" />
+          <figcaption><b>Where you'd expect them — but don't:</b> click through to that row's trace and the <b>Evaluations</b> tab reads <b>0</b>, landing you on an empty "Add Evaluator" screen. Same verdict, computed once — just absent from the surface you actually debug on.</figcaption>
+        </figure>
+      </div>
       <div class="frow"><div class="flab">Confirmed with Alyx (2026-06-13)</div><p><i>"Experiment eval scores are stored on the experiment run record, not written back onto the trace spans."</i> So it's deliberate — but the intent optimizes for the compare table, not the person debugging the trace.</p></div>
       <div class="frow fix-row"><div class="flab">Fix</div><p>Surface experiment eval verdicts on the <b>trace's Evals tab</b> — the same place production evals already appear — with a flag marking them experiment-sourced. Keep them on the compare table too; this is <b>additive, not a move</b>. The same evaluator already attaches to both a dataset and a tracing project, so the score is computed identically — the gap is purely that experiment scores aren't surfaced on the experiment's own traces.</p></div>
       <div class="frow"><div class="flab">Where</div><p class="where">Experiments → compare table → Trace link · trace/span detail <b>Evals tab</b>.</p></div>
