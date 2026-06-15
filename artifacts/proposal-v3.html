@@ -98,6 +98,11 @@
   .gap .gt{font-weight:700; color:var(--ink); font-size:15px; line-height:1.3}
   .gap p{margin:7px 0 0; font-size:13.5px}
 
+  /* eval-hierarchy table (structure repurposed from the concept ledger) */
+  .cn{color:var(--ink); font-weight:600}
+  tr.gaprow td{background:linear-gradient(90deg,rgba(45,212,191,.07),transparent)}
+  .here-tag{font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ax); white-space:nowrap}
+
   /* the loop diagram */
   .loop{border:1px solid var(--line2); border-radius:12px; padding:18px; margin:18px 0; background:var(--panel); overflow-x:auto}
   .loop .objbar{border:1px solid rgba(45,212,191,.45); border-radius:9px; padding:10px 14px; background:linear-gradient(180deg,var(--axGlow),transparent); text-align:center; font-family:var(--mono); font-size:12px; color:var(--ink); margin-bottom:8px}
@@ -154,7 +159,7 @@
   details.apx .apxbody>p:first-child{margin-top:12px}
   details.apx table{margin:10px 0} details.apx pre{margin:10px 0}
 
-  @media(max-width:860px){ .wrap{grid-template-columns:1fr} aside{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)} }
+  @media(max-width:860px){ .wrap{grid-template-columns:1fr} aside{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)} .hide-sm{display:none} }
   .homelink{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); text-decoration:none; border:0; margin-bottom:18px}
   .homelink:hover{color:var(--ax)}
 </style>
@@ -169,6 +174,7 @@
     <nav id="nav">
       <div class="grp">Frame</div>
       <a href="#goal">The ask</a>
+      <a href="#hierarchy">The eval hierarchy</a>
       <a href="#problem">What's solved / what isn't</a>
       <a href="#thesis">The thesis</a>
       <div class="grp">The bet</div>
@@ -205,11 +211,32 @@
       </div>
     </section>
 
+    <!-- HIERARCHY (grounding) -->
+    <section id="hierarchy">
+      <div class="eyebrow">first, the altitude · a hierarchy of evals</div>
+      <h2>Not every eval failure is a bug to fix.</h2>
+      <p>Eval failures stack on a hierarchy, and the rung decides what you <b>do</b> about them — <i>patch it</i>, or <i>decide</i> about it. The bottom is non-discretionary: did the agent run, and was it correct. Nobody convenes a meeting about a hallucination — you just fix it. Climb above that and the failures stop being bugs: the agent is reliable and accurate but lacks a <b>tool, a permission, the context, or runs into a policy</b>. Whether to <b>extend or augment</b> the agent — and how far — isn't a fix; it's a <b>discretionary call someone owns</b>, set by the business objective.</p>
+
+      <table>
+        <thead>
+          <tr><th>Rung</th><th>The question</th><th>Example failure</th><th class="hide-sm">What you do with it</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b class="cn">1 · Reliable &amp; accurate</b></td><td>Does it run, and is it <i>right</i>?</td><td>tool errors, malformed output, timeouts, hallucination, a wrong or ungrounded answer</td><td class="hide-sm"><b>Just fix it.</b> Must-fix, not a decision — broken or wrong, you solve it.</td></tr>
+          <tr class="gaprow"><td><b class="cn">2 · Capable &amp; in scope</b> <span class="here-tag">▸ the proposal lives here</span></td><td>Does it have what it needs to do the right thing?</td><td>missing tool, missing permission, missing context, a policy that blocks correct reasoning</td><td class="hide-sm"><b>Frame a decision.</b> Discretionary — a tradeoff someone owns and records.</td></tr>
+          <tr><td><b class="cn">3 · Good experience</b></td><td>Is it a <i>good</i> experience?</td><td>too verbose, off-tone, misses user frustration</td><td class="hide-sm">Tune — usually a product / design call.</td></tr>
+          <tr><td><b class="cn">4 · Exploratory</b></td><td>What don't we know yet?</td><td>new intents, drift, unexplained spikes</td><td class="hide-sm">Investigate.</td></tr>
+        </tbody>
+      </table>
+
+      <p>The real cut is <b>must-fix vs. discretionary</b>. The obvious failures — a hallucination, a misfiring tool — are must-fix and table stakes; Signal, LangSmith Engine, and Raindrop already find them. This proposal is about the rung above: failures that <b>pass every must-fix eval</b> and still cost the business, where extending the agent is a call someone owns rather than a bug an engineer quietly ships. Up there, an eval stops being a health check and becomes a <b>proxy for a business outcome</b> — which is the thesis, and everything below builds on this climb.</p>
+    </section>
+
     <!-- PROBLEM -->
     <section id="problem">
       <div class="eyebrow">what's solved, and what isn't</div>
       <h2>Finding the issue is table stakes. The business outcome isn't.</h2>
-      <p>Arize launched <b>Signal</b> this spring; LangSmith Engine and Raindrop shipped the same shape. They all cluster failures into ranked issues with proposed fixes — so <b>finding the issue is now table stakes.</b> What none of them owns is the harder, more valuable thing: making the agent better <i>for the business</i>. Three gaps sit between a found issue and a moved metric:</p>
+      <p><b>Above that line is where the value is — and it's unclaimed.</b> Arize launched <b>Signal</b> this spring; LangSmith Engine and Raindrop shipped the same shape — they cluster must-fix failures into ranked issues with proposed fixes. What none of them owns is the discretionary work: making the agent better <i>for the business</i>. Three gaps sit between a found issue and a moved metric:</p>
       <div class="gaps">
         <div class="gap"><div class="gn">gap 1 · the objective function</div><div class="gt">An eval scores the agent, not the business.</div><p>Evals measure <b>LLM behavior</b> — was the turn grounded, was it correct. That's a proxy. It can read green while the business objective fails: a support eval can rate every turn "correct" and the order still never gets delivered. Nothing today ranks issues by the <b>true objective function</b> — the outcome the agent exists to move.</p></div>
         <div class="gap"><div class="gn">gap 2 · the decision</div><div class="gt">The fixes that matter live outside the repo.</div><p>The expensive failures aren't prompt diffs — they're a <b>missing capability, a missing permission, a blocking policy</b>, owned by someone who isn't the engineer. Getting that decided and implemented is the bottleneck. Today the handoff is a Slack screenshot; the decision stalls and nothing tracks why.</p></div>
@@ -224,7 +251,8 @@
       <h2>An eval is an approximation of the true objective function. The objective function is a business outcome.</h2>
       <p>Every eval is a stand-in for what you actually want — and the gap between "the eval passed" and "the business won" is exactly where agents quietly fail. Observability that ends at the LLM boundary can <i>describe</i> the agent; only observability grounded in the real outcome can <i>improve</i> it. Arize should own the loop from <b>outcome → objective-ranked issue → decision made → verified lift</b>, and become accountable for whether the agent got better <i>for the business</i> — not just informed about what it did.</p>
       <div class="box tip"><div class="bt">◆ why Arize, why now</div>
-        <p><b>Arize is the neutral party — that's real leverage.</b> An outcome convention on OpenInference is a standard only the neutral player can credibly propose; anyone else's is a framework feature. That's not a moat by itself, but it's genuine control over where the standard goes — the same position that made OpenInference stick. <b>Signal validated the direction</b> (the "AI Factory" arc is now Arize's flagship), and this is its accountability layer. And <b>the bottleneck moved from building to deciding:</b> coding agents made fixes cheap to draft; what's expensive now is getting the change decided, shipped by the right owner, and proven. That's organizational throughput — an empty product surface.</p>
+        <p><b>The bigger value unlock isn't a better health monitor — it's moving up the hierarchy.</b> Once evals confirm the agent is functional, the platform that watched it the whole way is the one positioned to drive the next decision: what to change, what it's worth, and whether it worked. That turns Arize from the place you <i>watch</i> the agent into the place you <i>improve the business outcome</i> — the larger payoff for the customer. And the timing is right: <b>Signal validated the direction</b> (the "AI Factory" arc is now Arize's flagship), and <b>the bottleneck moved from building to deciding</b> — coding agents made fixes cheap to draft; what's expensive now is getting the change decided, shipped by the right owner, and proven.</p>
+        <p style="margin-top:8px"><b>Neutrality is the leverage that makes it defensible.</b> An outcome convention on OpenInference is a standard only the neutral player can credibly propose — anyone else's is a framework feature. And by leading here, Arize gets to <b>steer how outcomes get implemented across the ecosystem</b> — the same position that made OpenInference stick. That's a real edge, but it's <b>secondary</b>: the point is customer value first; setting the standard is the dividend.</p>
       </div>
       <div class="box why"><div class="bt">▣ where the objective earns its keep — experiments</div>
         <p>A north-star plus its counter-metrics isn't just for ranking issues. It's the frame that makes an <b>experiment</b> mean something: when you ship a change and re-run, the objective is what lets you <b>isolate the change's true impact</b> — did the north-star move, and did you trip a constraint doing it? Without a declared objective, an experiment is a number with no verdict.</p>
@@ -262,8 +290,8 @@
 
     <!-- DECISIONS -->
     <section id="decisions">
-      <div class="eyebrow">the engine</div>
-      <h2>③ Decisions — from recommendation to shipped, owned, and proven.</h2>
+      <div class="eyebrow">the third layer · the engine</div>
+      <h2>Decisions — from recommendation to shipped, owned, and proven.</h2>
       <p>The unit of value isn't a score, and it isn't even a fix suggestion — it's a <b>decision that gets made.</b> Each issue maps to a change type, and the change type determines the route and the verb:</p>
       <table>
         <tr><th>Change type</th><th>Example</th><th>Routes to</th><th>CTA</th></tr>
@@ -419,14 +447,17 @@
         <div class="rung v3">
           <div class="rv">V3 · the loop learns</div>
           <div class="rname">It earns the right to act.</div>
-          <div class="rt">Recommendations shaped by what this org <b>actually ships</b>; trusted change types go semi-auto under a policy owner — autonomy that's <b>earned, never assumed</b>.</div>
+          <div class="rt">Recommendations shaped by what this org <b>actually ships</b>; and for the changes Arize owns directly — <b>prompt &amp; config tuning</b> — trusted ones go semi-auto under a policy owner. Autonomy is <b>earned, never assumed</b> — and only ever reaches the tunable layer (see note).</div>
           <ul>
             <li>org-shaped recommendations</li>
-            <li>semi-auto for trusted changes</li>
+            <li>semi-auto for tunable changes only</li>
             <li>policy-owner surface</li>
             <li>earned autonomy</li>
           </ul>
         </div>
+      </div>
+      <div class="box gotcha" style="margin-top:18px"><div class="bt">▲ a ceiling on autonomy — by design</div>
+        <p>The ladder has a limit the platform structurally can't cross. Arize can draft and, eventually, auto-apply a <b>prompt or config</b> change — that's tuning it owns end-to-end. But the higher-value changes — <b>a new tool, a new permission, added context, a policy call</b> — <i>require the user to act</i>: the platform can compile the decision, route it, and prove the result, but it can never ship it alone. So "earned autonomy" only ever reaches the tunable layer; everything in the discretionary band stays a <b>human decision the platform makes faster and proves</b>. That's not a gap in the roadmap — it's the thesis restated: the changes that matter most live outside the repo, which is exactly why a <i>decision</i> surface, not an auto-fixer, is the right bet.</p>
       </div>
       <div class="box why" style="margin-top:18px"><div class="bt">▣ the build-to-proposal bridge</div>
         <p>Building and instrumenting my own agent on AX this week, I had the trace and could see the retrieval failure — but turning that insight into a durable, <i>decided</i> fix was manual and lived in my head. And nothing in my telemetry could say whether the answer my agent gave actually <i>served</i> the user — the outcome lived outside the trace. Both gaps — signal to decision, interaction to outcome — are what this closes. <span style="color:var(--dim)">(I built DoorDash's multi-agent support platform on this exact stack — Arize + OpenTelemetry — so I've lived the policy-owner handoff and the outcome blindness as the customer.)</span></p>

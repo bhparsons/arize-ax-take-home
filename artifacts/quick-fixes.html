@@ -28,21 +28,25 @@
 
   /* SIDE NAV */
   .sidenav{position:sticky; top:0; align-self:start; max-height:100vh; overflow-y:auto;
-    padding:clamp(28px,4vw,60px) 4px clamp(28px,4vw,60px) clamp(12px,2vw,20px);
-    font-family:var(--mono)}
-  .sidenav .navtitle{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:12px}
-  .sidenav a{display:flex; gap:9px; align-items:baseline; padding:6px 9px; border-left:2px solid var(--line); color:var(--mut); font-size:11.5px; line-height:1.4; text-decoration:none; transition:.16s}
-  .sidenav a:hover{color:var(--ink); border-left-color:var(--line2); background:rgba(255,255,255,.015)}
-  .sidenav a.active{color:var(--ink); border-left-color:var(--ax); background:var(--axGlow)}
-  .sidenav a .nn{color:var(--dim); flex:none; width:13px; text-align:right}
+    padding:clamp(28px,4vw,60px) 4px clamp(28px,4vw,60px) clamp(12px,2vw,20px)}
+  .sidenav .brand{font-family:var(--disp); font-weight:900; font-size:21px; line-height:1.05; letter-spacing:-.01em; margin-bottom:4px}
+  .sidenav .brand .ax{color:var(--ax)}
+  .sidenav .brandsub{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:22px}
+  .sidenav .navtitle{font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:2px 0 6px 10px}
+  .sidenav a{display:block; font-size:13.5px; color:var(--mut); text-decoration:none; padding:6px 10px; border-radius:6px; border-left:2px solid transparent; line-height:1.4; transition:.18s}
+  .sidenav a:hover{color:var(--ink); background:var(--panel)}
+  .sidenav a.active{color:var(--ax); border-left-color:var(--ax); background:var(--axGlow)}
+  .sidenav a .nn{color:var(--dim)}
+  .sidenav a .nn::after{content:" · "}
   .sidenav a.active .nn{color:var(--ax)}
-  .sidenav a .nt{flex:1; min-width:0}
-  .sidenav .navfoot{margin-top:14px; padding-top:12px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:7px}
-  .sidenav .navfoot a{border-left:0; padding:0 0 0 9px; color:var(--ax); font-size:11px}
+  .sidenav .navfoot{margin-top:14px; padding-top:12px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:2px}
+  .sidenav .navfoot a{color:var(--ax)}
+  .homelink-m{display:none}
   @media(max-width:920px){
     .shell{display:block; max-width:880px; margin:0 auto}
     .page{padding:clamp(20px,4vw,40px)}
     .sidenav{display:none}
+    .homelink-m{display:block}
   }
 
   /* LIGHTBOX */
@@ -141,7 +145,10 @@
 
   <!-- SIDE NAV -->
   <nav class="sidenav" id="sidenav">
-    <div class="navtitle">Nine fixes</div>
+    <a class="homelink" href="../index.html">← Back to Index</a>
+    <div class="brand">Nine quick <span class="ax">fixes</span></div>
+    <div class="brandsub">onboarding &amp; DX papercuts</div>
+    <div class="navtitle">The fixes</div>
     <a href="#fix-1"><span class="nn">1</span><span class="nt">Silent async-task trap</span></a>
     <a href="#fix-2"><span class="nn">2</span><span class="nt">Version-drift in snippets</span></a>
     <a href="#fix-3"><span class="nn">3</span><span class="nt">OpenRouter + silent $0 cost</span></a>
@@ -165,7 +172,7 @@
 
 <div class="page">
 
-  <a class="homelink" href="../index.html">← Back to Index</a>
+  <a class="homelink homelink-m" href="../index.html">← Back to Index</a>
 
   <!-- HERO -->
   <section class="hero">

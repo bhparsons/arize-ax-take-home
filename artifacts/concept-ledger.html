@@ -165,7 +165,7 @@
     <p><b>2 · "A competitor shipped it" is market evidence, not a verdict.</b> If Langfuse or an open standard solves a piece but Arize doesn't, and the developer has to leave Arize to get it, that fragmentation is a reason to <i>build</i> — not a reason to drop. We don't get a capability "for free" because someone else has it.</p>
   </div>
 
-  <p style="color:var(--dim)">The two highest-value gaps below — trusting the evals, and turning high-stakes failures into recorded decisions — are what the proposal is built on. This appendix is the reasoning behind that choice; the <a href="#handoff">handoff</a> says where each thread lands in the proposal itself.</p>
+  <p style="color:var(--dim)">The proposal's headline — <i>From Signal to Decisions</i>, grounding agent improvement in the business outcome — grew out of two of these gaps: the <b>decision surface</b> that turns a high-stakes failure into a recorded, routed decision is its <b>engine</b>, and <b>trusting the evals</b> is the <b>foundation</b> any such decision rests on. This appendix is the reasoning behind that choice; the <a href="#handoff">handoff</a> says where each thread lands in the proposal itself.</p>
 </section>
 
 <!-- ===================== HOW TO READ ===================== -->
@@ -183,7 +183,7 @@
 <section id="ladder">
   <div class="eyebrow">the backbone · what evals are actually for</div>
   <h2>Not every eval failure is a bug to fix.</h2>
-  <p class="lead">The concepts below only sort cleanly once you see that evals do different jobs depending on <i>where</i> the failure sits. This is the spine the whole proposal hangs from.</p>
+  <p class="lead">The concepts below only sort cleanly once you see that evals do different jobs depending on <i>where</i> the failure sits — and that the bottom of the ladder is fast becoming a commodity while the top stays wide open. This is the spine the whole proposal hangs from.</p>
 
   <p>Failures stack on a ladder, and the rung decides what you <b>do</b> about them — patch it, or <i>decide</i> about it:</p>
 
@@ -192,16 +192,21 @@
     <tr><th>Rung</th><th>The question</th><th>Example failure</th><th class="hide-sm">What you do with it</th></tr>
     </thead>
     <tbody>
-      <tr><td><b class="cn">1 · Reliable</b></td><td>Does it even run?</td><td>tool errors, malformed output, timeouts</td><td class="hide-sm"><b>Triage &amp; fix.</b> Not a decision — just broken.</td></tr>
-      <tr class="gaprow"><td><b class="cn">2 · Capable &amp; accurate</b></td><td>Does it do the <i>right</i> thing?</td><td>missing tool, missing permission, a policy that blocks correct reasoning, hallucination</td><td class="hide-sm"><b>Frame a decision.</b> A tradeoff, often intentional — needs an owner and a record.</td></tr>
+      <tr><td><b class="cn">1 · Reliable &amp; accurate</b></td><td>Does it run, and is it <i>right</i>?</td><td>tool errors, malformed output, timeouts, hallucination, a wrong or ungrounded answer</td><td class="hide-sm"><b>Triage &amp; fix.</b> Must-fix, not a decision — broken or wrong, you just solve it.</td></tr>
+      <tr class="gaprow"><td><b class="cn">2 · Capable &amp; in scope</b></td><td>Does it have what it needs to do the right thing?</td><td>missing tool, missing permission, missing context, a policy that blocks correct reasoning</td><td class="hide-sm"><b>Frame a decision.</b> Discretionary — a tradeoff someone owns and records.</td></tr>
       <tr><td><b class="cn">3 · Good experience</b></td><td>Is it a <i>good</i> experience?</td><td>too verbose, off-tone, misses user frustration</td><td class="hide-sm">Tune — usually a product/design call.</td></tr>
       <tr><td><b class="cn">4 · Exploratory</b></td><td>What don't we know yet?</td><td>new intents, drift, unexplained spikes</td><td class="hide-sm">Investigate.</td></tr>
     </tbody>
   </table>
 
   <div class="box tip"><div class="bt">◆ the move that matters</div>
-    <p style="margin-top:6px"><b>Low rungs are fixes. High rungs are decisions.</b> Rung-1 failures get triaged and patched — nobody needs to weigh in. Rung-2 is different: the agent hit a boundary (it lacked a tool, a permission, the knowledge, or a policy blocked it), and resolving it is a <i>tradeoff</i> someone has to own and record — not a line an engineer quietly ships.</p>
-    <p><b>And the ladder is climbed for a business objective, not an eval score.</b> Which Rung-2 tradeoffs are worth making is set by the agent's North Star — its actual purpose — not by whichever eval happens to be red. The two lead gaps below (<a href="#trust">trusting the evals</a>, <a href="#decide">the decision surface</a>) are exactly the pieces missing to make that real — which is why they're what the proposal builds.</p>
+    <p style="margin-top:6px"><b>The real cut is must-fix vs. discretionary</b> — and it's the cut the market is moving across right now:</p>
+    <ul>
+      <li><b>Must-fix is commoditizing.</b> Finding what broke and grading whether the agent ran and was right — reliability, accuracy, groundedness — is fast becoming table stakes. Signal, LangSmith Engine, Raindrop, and a dozen eval frameworks all do it. A hallucination or a wrong answer isn't a tradeoff; you just solve it, and nobody needs to weigh in.</li>
+      <li><b>Discretionary is underserved.</b> The agent runs and is correct but hit a boundary — it lacked a tool, a permission, the context, or a policy blocked it. Whether to <i>extend</i> it is a tradeoff someone has to own and record, not a line an engineer quietly ships. Almost nothing serves that <i>decision</i> today.</li>
+    </ul>
+    <p>Both layers matter. But as functional evals commoditize, the larger value moves to the layer above — <b>turning a failure into a business decision</b> — and that layer is wide open. <b>That's the timing: now is the moment to build it, and the proposal lives in that discretionary band.</b></p>
+    <p><b>And the ladder is climbed for a business objective, not an eval score.</b> Which Rung-2 tradeoffs are worth making is set by the agent's North Star — its actual purpose — not by whichever eval happens to be red. The two lead gaps below — <a href="#decide">the decision surface</a> (the engine) and <a href="#trust">trusting the evals</a> (the foundation under it) — are exactly the pieces missing to make that real, which is why they're what the proposal builds.</p>
   </div>
 </section>
 
@@ -219,13 +224,13 @@
       <td><a href="#trust"><b class="cn">Trust the evals</b></a></td>
       <td>You generated an eval — but can you <i>trust</i> it?</td>
       <td><span class="stat gap">🚀 real gap</span></td>
-      <td class="hide-sm">→ the proposal's headline</td>
+      <td class="hide-sm">→ the foundation it rests on</td>
     </tr>
     <tr class="gaprow">
       <td><a href="#decide"><b class="cn">The decision surface</b></a></td>
       <td>A high-stakes failure needs a recorded decision, not a quiet code fix.</td>
       <td><span class="stat gap">🚀 real gap</span></td>
-      <td class="hide-sm">→ the proposal's decision engine</td>
+      <td class="hide-sm">→ the proposal's headline engine</td>
     </tr>
     <tr class="gaprow">
       <td><a href="#completeness"><b class="cn">Live judge-drift</b></a></td>
@@ -270,13 +275,13 @@
 <!-- ===================== TRUST THE EVALS — SPOTLIGHT ===================== -->
 <section id="trust">
   <div class="card spot">
-  <div class="crown">★ the gap the proposal headline grew from</div>
-  <div class="eyebrow" style="margin-top:4px">real gap · the lead</div>
+  <div class="crown">★ the foundation the proposal's loop rests on</div>
+  <div class="eyebrow" style="margin-top:4px">real gap · the foundation</div>
   <h3 style="font-size:23px">Trust the evals — is the grader <span style="font-style:italic">accurate</span>, and is it measuring the <span style="font-style:italic">right thing</span>?</h3>
-  <div class="badges"><span class="stat gap">🚀 real gap</span><span class="chip">the proposal's headline</span></div>
+  <div class="badges"><span class="stat gap">🚀 real gap</span><span class="chip">the loop's foundation</span></div>
   <p class="pain"><b>Pain:</b> every tool can now <b>generate</b> an eval (an automated grader) from a bad output — none check whether that grader is any good. Two separate questions go unanswered: is it <b>accurate</b> (does it agree with a human, or does it false-alarm), and is it <b>measuring the right thing</b> (is it graded against what the agent is actually <i>for</i>). You're asked to trust a grader you never tested, scoring something you never confirmed matters.</p>
   <p class="pain"><b>What to build:</b> before a generated eval ships, test it on held-back examples and report whether it still agrees with human reviewers and how often it false-alarms. Activation metric: <i>% of new agent projects with ≥1 persisted, trust-checked AX eval within 7 days.</i></p>
-  <p class="verdict"><b>Why it's the headline:</b> observability tells you <i>what</i> failed; nothing tells you whether the thing measuring failure can be trusted. Every downstream decision in the proposal rests on a number from an eval — so the eval has to be trustworthy first. It also has a natural <b>lifecycle — certify → monitor → decompose</b>, which is where the next two gaps (<a href="#completeness">judge-drift + reviewer agreement</a>) live: certify the grader pre-ship on held-out examples, keep the agreement check running post-ship and alert on decay, and break the score down per rubric criterion to localize the cause.</p>
+  <p class="verdict"><b>Why it's load-bearing — the foundation, not the headline:</b> observability tells you <i>what</i> failed; nothing tells you whether the thing measuring failure can be trusted. Every downstream decision in the proposal rests on a number from an eval — so the eval has to be trustworthy <i>first</i>. The headline climbs above this — decisions grounded in the business outcome — but it's only as sound as the signal beneath it, and this gap's instinct (<i>don't trust a number you haven't tested</i>) becomes the proposal's verified-lift discipline. It also has a natural <b>lifecycle — certify → monitor → decompose</b>, which is where the next two gaps (<a href="#completeness">judge-drift + reviewer agreement</a>) live: certify the grader pre-ship on held-out examples, keep the agreement check running post-ship and alert on decay, and break the score down per rubric criterion to localize the cause.</p>
 
   <details>
     <summary>market scan &amp; evidence <span class="sx">verdict: open sliver, closing fast · 2026-06-11</span></summary>
@@ -295,7 +300,7 @@
   <div class="card">
   <div class="eyebrow">real gap · what high-rung failures actually need</div>
   <h3 style="font-size:21px">The decision surface — a Rung-2 failure is a decision to record, not a code fix.</h3>
-  <div class="badges"><span class="stat gap">🚀 real gap</span><span class="chip">the proposal's decision engine</span></div>
+  <div class="badges"><span class="stat gap">🚀 real gap</span><span class="chip">the proposal's headline engine</span></div>
   <p class="pain"><b>Pain:</b> when an agent hits a Rung-2 boundary — a policy blocks correct reasoning, a missing permission forces a handoff, a capability gap — the resolution is a <b>tradeoff someone has to own and record</b>, and that someone is often <i>not</i> the engineer (a policy owner, a platform team, legal). There's no surface where that decision gets framed, routed, signed off, and kept. Today it's a screenshot in Slack: the recommendation exists; the decision never gets recorded, and nothing tracks why. <b>Lived evidence:</b> DoorDash built internal tooling that "skinned" Arize so operators could manage prompt versions and configure evals on their side, passing through to Arize where the evals ran. It "felt sloppy" — because the surface they needed didn't exist, so they hand-built it.</p>
   <p class="pain"><b>What to build:</b> a decision record for high-rung failures — the issue, the evidence, the tradeoff (the upside <i>and</i> what it costs), the owner it routes to, and a status trail (proposed → routed → decided → verified). Viewable by the non-engineer owner without an Arize login, because they don't have one yet.</p>
   <p class="verdict"><b>Why it's a gap, not plumbing:</b> the eval-config <i>data round-trip</i> already ships (the Online Tasks GraphQL API), so this isn't about wiring. What's missing is the surface where a tradeoff becomes an owned, recorded decision — the thing the ladder says Rung-2 failures need and nothing provides. In the proposal this is the <b>Decision Artifact</b>: the engine that turns a trusted eval signal into a decision that actually gets made.</p>

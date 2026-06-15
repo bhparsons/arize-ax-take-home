@@ -10,18 +10,41 @@ Blake Parsons for the Arize AI **AI Product Manager** take-home.
 > through everything rendered. (On GitHub directly, `.html` files show as source — the live link is
 > the easy path. If you have this as a zip, open [`index.html`](index.html) in a browser instead.)
 
+*▸ [Watch the short primer voiceover](https://www.loom.com/share/554e56c942da46c3be57cae7c7282295) — a quick spoken tour, if you'd rather be walked through it first.*
+
 The assignment has three parts — a **build**, evidence of both Arize **workflows**, and a visual
 **proposal**. Each has a home below.
 
 | # | Deliverable | Where it lives | Status |
 |---|---|---|---|
 | ① | **Build** — agent traced + evaluated on AX | [`src/`](src/) (live in AX project `dev-research-assistant`) | ✅ |
-| ② | **Workflows + onboarding feedback** | [`artifacts/RESULTS.html`](artifacts/RESULTS.html), [`artifacts/quick-fixes.html`](artifacts/quick-fixes.html), [`artifacts/FEEDBACK.html`](artifacts/FEEDBACK.html) | ✅ |
+| ② | **Workflows + onboarding feedback** | [`artifacts/results.html`](artifacts/results.html), [`artifacts/quick-fixes.html`](artifacts/quick-fixes.html), [`artifacts/FEEDBACK.html`](artifacts/FEEDBACK.html) | ✅ |
 | ③ | **Proposal** — visual MVP | [`artifacts/proposal-v3.html`](artifacts/proposal-v3.html) · mocks [`artifacts/mocks-v3.html`](artifacts/mocks-v3.html) | ✅ |
 
-**If you read one thing:** [`artifacts/proposal-v3.html`](artifacts/proposal-v3.html) (the proposal —
-*From Signal to Decisions*) and [`artifacts/RESULTS.html`](artifacts/RESULTS.html) (the workflow evidence).
-Everything else supports those two.
+**Short on time? A ~10-minute read** — punchline first, then the evidence:
+**1.** [`artifacts/proposal-v3.html`](artifacts/proposal-v3.html) (the pitch — *From Signal to Decisions*) →
+**2.** [`artifacts/results.html`](artifacts/results.html) (the workflow evidence) →
+**3.** skim [`src/agent.py`](src/agent.py) + [`src/tracing.py`](src/tracing.py) →
+**4.** [`artifacts/architecture.html`](artifacts/architecture.html) for the traced execution path.
+Everything else supports those.
+
+## The journey — five stops, build to proposal
+
+The table above is the three deliverables Arize asked for. **This** is the path I actually took to
+produce them — read top to bottom. I built and ran the agent, analyzed its behavior on Arize, shipped
+the small fixes I'd want tomorrow, pulled the bigger themes out of that experience — and **the proposal
+flows from those themes**. It climbs from tactical to strategic, which is the point: the Part-3 pitch is
+grounded in the build, not invented.
+
+> the path · **build → analyze → fix → themes → proposal**
+
+| # | Stop | What I did | Where to look |
+|---|---|---|---|
+| 1 | **Build & run the agent** | Pydantic-AI research agent on Claude, traced end-to-end into AX | [`architecture.html`](artifacts/architecture.html) · [`code-internals.html`](artifacts/code-internals.html) |
+| 2 | **Run the initial analysis** | Golden set → experiment → LLM judges, with a deliberate retriever failure to debug | [`results.html`](artifacts/results.html) · [`FEEDBACK.html`](artifacts/FEEDBACK.html) (raw log) |
+| 3 | **Ship the quick fixes** | Nine onboarding / DX papercuts I'd fix tomorrow — all found live in the build | [`quick-fixes.html`](artifacts/quick-fixes.html) |
+| 4 | **Pull out the themes** | Step back: which gaps are real, what evals are actually for, what to build vs. skip | [`concept-ledger.html`](artifacts/concept-ledger.html) |
+| 5 | **The proposal flows from there** | *From Signal to Decisions* — the biggest theme, built into an MVP | [`proposal-v3.html`](artifacts/proposal-v3.html) · [`mocks-v3.html`](artifacts/mocks-v3.html) |
 
 ## Quick start — run the agent in ~2 minutes
 
@@ -62,22 +85,24 @@ AGENT (researcher)
 | `src/config.py` | Keys, model map, OpenRouter endpoint |
 | `src/dataset.py` · `src/experiment.py` | Golden dataset + LLM-judge experiment engine |
 
-**Deep tour:** [`artifacts/architecture.html`](artifacts/architecture.html) (one query traced ①→⑨) and
-[`artifacts/code-internals.html`](artifacts/code-internals.html) (the code mental-model).
+**Deep tour:** [`artifacts/code-internals.html`](artifacts/code-internals.html) is the full
+walkthrough — it opens with the system diagram, traces one query ①→⑨, and explains the wiring
+(tracing link, span emission, decorators, the eval engine). For the live, zoomable diagram on its own,
+open [`artifacts/architecture.html`](artifacts/architecture.html).
 
 ## ② Workflows + evidence
 
 Both Arize workflows were run:
 
 - **Development** — a 12-row golden dataset → an experiment with two LLM-judges (correctness +
-  groundedness) → a three-model comparison (Claude / GPT / Gemini). Repro commands in `RESULTS.html`.
+  groundedness) → a three-model comparison (Claude / GPT / Gemini). Repro commands in `results.html`.
 - **Observability** — traces land in AX; a **deliberate retriever failure** (drop corpus docs) makes
   the groundedness judge score those traces low; root-cause in the waterfall (empty RETRIEVER span →
   fabricated answer); fix → score recovers.
 
 | File | What it shows |
 |---|---|
-| [`artifacts/RESULTS.html`](artifacts/RESULTS.html) | Model comparison + failure delta, with the AX waterfall + experiment-comparison captures embedded, and repro commands |
+| [`artifacts/results.html`](artifacts/results.html) | Model comparison + failure delta, with the AX waterfall + experiment-comparison captures embedded, and repro commands |
 | [`artifacts/quick-fixes.html`](artifacts/quick-fixes.html) | Onboarding DX writeup — nine papercuts + a "what went well" box, with evidence screenshots |
 | [`artifacts/FEEDBACK.html`](artifacts/FEEDBACK.html) | The raw, as-it-happened onboarding-friction log |
 

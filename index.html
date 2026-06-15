@@ -53,6 +53,7 @@
   ul,ol{color:var(--mut); margin:10px 0 10px 22px; max-width:74ch}
   li{margin:6px 0}
   .lead{font-size:19px; color:var(--ink); max-width:72ch}
+  .primer{font-family:var(--mono); font-size:12.5px; color:var(--dim); margin:10px 0 2px}
 
   code{font-family:var(--mono); font-size:.88em; background:#0c1318; border:1px solid var(--line); border-radius:5px; padding:1px 6px; color:#bfe9e0}
   code a{border:0}
@@ -82,6 +83,21 @@
   .card h3{margin:0 0 6px; font-size:17px}
   .card p{font-size:13.5px; margin:4px 0}
 
+  /* journey — the chronological 5-stop process (build → proposal) */
+  .jflow{font-family:var(--mono); font-size:11.5px; letter-spacing:.05em; color:var(--dim); margin:14px 0 2px}
+  .jflow b{color:var(--ax); font-weight:600}
+  .journey{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin:16px 0 4px}
+  .jcard{position:relative; border:1px solid var(--line2); border-radius:12px; padding:14px 14px 16px; background:linear-gradient(180deg,var(--panel),var(--bg2)); display:flex; flex-direction:column}
+  .jcard .n{font-family:var(--mono); width:26px; height:26px; border-radius:7px; border:1px solid var(--ax); color:var(--ax); display:grid; place-items:center; font-size:13px; margin-bottom:10px}
+  .jcard h3{font-size:14.5px; margin:0 0 5px; line-height:1.22; color:var(--ink)}
+  .jcard p{font-size:12px; line-height:1.5; margin:0 0 11px; color:var(--mut)}
+  .jcard .lk{margin-top:auto; display:flex; flex-direction:column; gap:3px; font-family:var(--mono); font-size:11.5px}
+  .jcard .lk a{border:0; color:var(--ax); white-space:nowrap}
+  .jcard .lk a.sec{color:var(--mut)}
+  .jcard:not(:last-child)::after{content:"→"; position:absolute; right:-9px; top:50%; transform:translateY(-50%); color:var(--line2); font-size:13px; z-index:1}
+  @media(max-width:760px){ .journey{grid-template-columns:1fr 1fr} .jcard::after{content:none!important} }
+  @media(max-width:480px){ .journey{grid-template-columns:1fr} }
+
   .step{display:flex; gap:14px; margin:12px 0; align-items:flex-start}
   .step .n{font-family:var(--mono); flex:none; width:30px; height:30px; border-radius:8px; border:1px solid var(--ax); color:var(--ax); display:grid; place-items:center; font-size:13px}
   .step .b{flex:1}
@@ -102,6 +118,12 @@
     <nav id="nav">
       <div class="grp">Start</div>
       <a href="#overview" class="on">Overview</a>
+      <a href="#journey">The journey · 5 stops</a>
+      <div class="grp">Jump straight in ↗</div>
+      <a href="artifacts/code-internals.html">The build</a>
+      <a href="artifacts/results.html">The workflow</a>
+      <a href="artifacts/quick-fixes.html">Evidence &amp; feedback</a>
+      <a href="artifacts/proposal-v3.html">The proposal</a>
       <div class="grp">The 3 deliverables</div>
       <a href="#build">① The build</a>
       <a href="#workflows">② Workflows + evidence</a>
@@ -109,7 +131,6 @@
       <div class="grp">Using this repo</div>
       <a href="#run">How to run it</a>
       <a href="#map">Where everything lives</a>
-      <a href="#read">Suggested path</a>
     </nav>
   </aside>
 
@@ -124,6 +145,8 @@
         <b>Arize AX</b> — tracing, offline experiments, online evals, and a deliberately-debugged
         retrieval failure. This page is the map: it tells you what's here and where to look.</p>
 
+      <p class="primer">▸ <a href="https://www.loom.com/share/554e56c942da46c3be57cae7c7282295">Watch the short primer voiceover</a> — a quick spoken tour, if you'd rather be walked through it first.</p>
+
       <p>Built by <b>Blake Parsons</b>. The assignment has three parts — a <b>build</b>, evidence of
         both Arize <b>workflows</b> (development + observability), and a visual <b>proposal</b>. Each
         has a home below.</p>
@@ -131,19 +154,64 @@
       <div class="deliv">
         <div class="card"><div class="k">① Build</div><h3>The agent</h3>
           <p>Pydantic-AI agent + RAG, traced live on AX.</p>
-          <p><code>src/</code> · <a href="artifacts/architecture.html">architecture →</a></p></div>
+          <p><code>src/</code> · <a href="artifacts/code-internals.html">how it works →</a></p></div>
         <div class="card"><div class="k">② Workflows</div><h3>Evidence</h3>
           <p>Dataset→experiment→evals, plus a debugged failure.</p>
-          <p><a href="artifacts/RESULTS.html">RESULTS.html →</a></p></div>
+          <p><a href="artifacts/results.html">results.html →</a></p></div>
         <div class="card"><div class="k">③ Proposal</div><h3>The MVP pitch</h3>
           <p><i>From Signal to Decisions</i> — grounding the improvement loop in outcomes.</p>
           <p><a href="artifacts/proposal-v3.html">proposal-v3.html →</a></p></div>
       </div>
 
-      <div class="box tip"><div class="bt">◆ if you read one thing</div>
-        <p>Open <a href="artifacts/proposal-v3.html">artifacts/proposal-v3.html</a> (the proposal) and
-          <a href="artifacts/RESULTS.html">artifacts/RESULTS.html</a> (the workflow evidence). Everything
-          else here supports those two.</p></div>
+      <div class="box tip"><div class="bt">◆ short on time? a ~10-minute read</div>
+        <p>Read the punchline first, then the evidence:
+          <b>1.</b> <a href="artifacts/proposal-v3.html">proposal-v3.html</a> (the pitch) →
+          <b>2.</b> <a href="artifacts/results.html">results.html</a> (the workflow evidence) →
+          <b>3.</b> skim <code>src/agent.py</code> + <code>src/tracing.py</code> →
+          <b>4.</b> <a href="artifacts/code-internals.html">code-internals.html</a> for how the
+          build runs (it opens with the system diagram). Everything else supports those.</p></div>
+    </section>
+
+    <!-- ---------- JOURNEY ---------- -->
+    <section id="journey">
+      <div class="eyebrow">the journey · how this came together</div>
+      <h2>Five stops, build to proposal</h2>
+      <p>The three cards above are the deliverables Arize asked for. <b>This</b> is the path I actually
+        took to produce them — read left to right. I built and ran the agent, analyzed its behavior on
+        Arize, shipped the small fixes I'd want tomorrow, pulled the bigger themes out of that
+        experience — and <b>the proposal flows from those themes</b>. It climbs from tactical to
+        strategic, which is the point: the Part-3 pitch is grounded in the build, not invented.</p>
+      <div class="jflow">the path · <b>build → analyze → fix → themes → proposal</b></div>
+
+      <div class="journey">
+        <div class="jcard"><div class="n">1</div>
+          <h3>Build &amp; run the agent</h3>
+          <p>Pydantic-AI research agent on Claude, traced end-to-end into AX.</p>
+          <div class="lk"><a href="artifacts/code-internals.html">how it works →</a>
+            <a class="sec" href="artifacts/architecture.html">live diagram →</a></div></div>
+
+        <div class="jcard"><div class="n">2</div>
+          <h3>Run the initial analysis</h3>
+          <p>Golden set → experiment → LLM judges, with a deliberate retriever failure to debug.</p>
+          <div class="lk"><a href="artifacts/results.html">results →</a>
+            <a class="sec" href="artifacts/FEEDBACK.html">raw log →</a></div></div>
+
+        <div class="jcard"><div class="n">3</div>
+          <h3>Ship the quick fixes</h3>
+          <p>Nine onboarding / DX papercuts I'd fix tomorrow — all found live in the build.</p>
+          <div class="lk"><a href="artifacts/quick-fixes.html">quick fixes →</a></div></div>
+
+        <div class="jcard"><div class="n">4</div>
+          <h3>Pull out the themes</h3>
+          <p>Step back: which gaps are real, what evals are actually for, what to build vs. skip.</p>
+          <div class="lk"><a href="artifacts/concept-ledger.html">concept ledger →</a></div></div>
+
+        <div class="jcard"><div class="n">5</div>
+          <h3>The proposal flows from there</h3>
+          <p><i>From Signal to Decisions</i> — the biggest theme, built into an MVP.</p>
+          <div class="lk"><a href="artifacts/proposal-v3.html">proposal →</a>
+            <a class="sec" href="artifacts/mocks-v3.html">UI mocks →</a></div></div>
+      </div>
     </section>
 
     <!-- ---------- BUILD ---------- -->
@@ -178,10 +246,10 @@
       </table>
 
       <div class="box why"><div class="bt">▣ want the deep tour?</div>
-        <p>Two companion explainers walk the build in detail:
-          <a href="artifacts/architecture.html">architecture.html</a> (one query traced ①→⑨) and
-          <a href="artifacts/code-internals.html">code-internals.html</a> (the code mental-model:
-          the tracing link, span emission, decorators, the eval engine).</p></div>
+        <p><a href="artifacts/code-internals.html">code-internals.html</a> is the full walkthrough — it
+          opens with the system diagram, traces one query ①→⑨, then explains the wiring: the tracing
+          link, span emission, closures, decorators, and the eval engine. For the <b>live, zoomable</b>
+          version of that diagram on its own, open <a href="artifacts/architecture.html">architecture.html</a>.</p></div>
     </section>
 
     <!-- ---------- WORKFLOWS ---------- -->
@@ -194,7 +262,7 @@
       <div class="step"><div class="n">A</div><div class="b"><b>Development:</b> a 12-row golden
         dataset → an experiment with two LLM-judges (correctness + groundedness) → a three-model
         comparison (Claude / GPT / Gemini). Reproduce with the commands in
-        <a href="artifacts/RESULTS.html">RESULTS.html</a>.</div></div>
+        <a href="artifacts/results.html">results.html</a>.</div></div>
       <div class="step"><div class="n">B</div><div class="b"><b>Observability:</b> traces land in AX;
         a <b>deliberate retriever failure</b> (drop corpus docs) makes the groundedness judge score
         those traces low; root-cause in the waterfall (empty RETRIEVER span → fabricated answer);
@@ -203,7 +271,7 @@
       <h4>Where the evidence lives</h4>
       <table>
         <tr><th>File</th><th>What it shows</th></tr>
-        <tr><td><code><a href="artifacts/RESULTS.html">artifacts/RESULTS.html</a></code></td><td>Model comparison + the failure delta, with the AX waterfall + experiment-comparison captures embedded, and repro commands.</td></tr>
+        <tr><td><code><a href="artifacts/results.html">artifacts/results.html</a></code></td><td>Model comparison + the failure delta, with the AX waterfall + experiment-comparison captures embedded, and repro commands.</td></tr>
         <tr><td><code><a href="artifacts/quick-fixes.html">artifacts/quick-fixes.html</a></code></td><td>The onboarding DX writeup — nine papercuts + a "what went well" box, with evidence screenshots.</td></tr>
         <tr><td><code><a href="artifacts/FEEDBACK.html">artifacts/FEEDBACK.html</a></code></td><td>The raw, as-it-happened onboarding-friction log.</td></tr>
       </table>
@@ -267,20 +335,10 @@ python -m src.run --model gpt <span class="str">"..."</span>            <span cl
         <tr><td><code>proposal-v3.html</code> · <code>mocks-v3.html</code></td><td>Part-3 visual proposal (<i>From Signal to Decisions</i>) + UI mocks.</td></tr>
         <tr><td><code>concept-ledger.html</code></td><td>Proposal appendix — every concept considered + triage.</td></tr>
         <tr><td><code>quick-fixes.html</code></td><td>Onboarding DX feedback — papercuts + "what went well", with screenshots.</td></tr>
-        <tr><td><code>RESULTS.html</code> · <code>FEEDBACK.html</code></td><td>Workflow evidence (waterfall + comparison embedded) + the raw DX log.</td></tr>
-        <tr><td><code><a href="artifacts/architecture.html">architecture.html</a></code> · <code><a href="artifacts/code-internals.html">code-internals.html</a></code></td><td>Explainer companions (how the build works).</td></tr>
+        <tr><td><code>results.html</code> · <code>FEEDBACK.html</code></td><td>Workflow evidence (waterfall + comparison embedded) + the raw DX log.</td></tr>
+        <tr><td><code><a href="artifacts/code-internals.html">code-internals.html</a></code></td><td>The build explainer — system diagram, the tracing link, span emission, decorators, the eval engine.</td></tr>
+        <tr><td><code><a href="artifacts/architecture.html">architecture.html</a></code></td><td>That system diagram on its own — full-screen, live, zoomable SVG.</td></tr>
       </table>
-    </section>
-
-    <!-- ---------- READ ---------- -->
-    <section id="read">
-      <div class="eyebrow">Suggested path</div>
-      <h2>A 10-minute read</h2>
-      <div class="box tip"><div class="bt">◆ in order</div>
-        <p>1. This page → 2. <a href="artifacts/proposal-v3.html">proposal-v3.html</a> (the pitch) → 3.
-          <a href="artifacts/RESULTS.html">RESULTS.html</a> (the evidence) → 4. skim
-          <code>src/agent.py</code> + <code>src/tracing.py</code> → 5.
-          <a href="artifacts/architecture.html">architecture.html</a> for the traced execution path.</p></div>
 
       <div class="foot">Dev Research Assistant on Arize AX · Blake Parsons</div>
     </section>
